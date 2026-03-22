@@ -265,17 +265,7 @@
                                                 <div @click="addSubCategory(category.id)"
                                                     class="px-3 py-2 hover:bg-blue-50 cursor-pointer text-xs text-gray-700">
                                                     <i class="fas fa-minus w-4 text-gray-500"></i> Add Divider</div>
-                                                <div
-                                                    class="px-3 py-2 hover:bg-yellow-50 cursor-pointer text-xs text-gray-700 flex items-center relative group/submenu">
-                                                    <i class="fas fa-share-square w-4 text-yellow-500"></i> Move to...<div
-                                                        class="absolute left-full top-0 w-32 bg-white shadow-xl rounded border border-gray-300 hidden group-hover/submenu:block ml-1 max-h-48 overflow-y-auto">
-                                                        <div v-for="b in boards" :key="b.id"
-                                                            v-show="b.id !== activeBoardId"
-                                                            @click.stop="moveCategoryToCollection(column.id, category, b.id)"
-                                                            class="px-3 py-2 hover:bg-gray-100 truncate">{{ b.title }}
-                                                        </div>
-                                                    </div>
-                                                </div>
+
                                             </div>
                                         </div>
                                     </div>
