@@ -131,8 +131,7 @@
     </style>
 </head>
 
-<body id="app" class="h-screen w-screen overflow-hidden bg-cover bg-center"
-    :style="{ backgroundImage: `url('${backgroundImage}')` }">
+<body id="app" class="h-screen w-screen overflow-hidden bg-gray-100 dark:bg-dark-bg">
 
     <div class="flex h-full w-full bg-gray-100/80 backdrop-blur-sm" :class="`theme-${themeColor}`">
 
@@ -513,16 +512,7 @@
                 <!-- 3. Appearance -->
                 <div class="mb-2 pt-5 border-t border-gray-100 dark:border-dark-border">
                     <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Appearance</label>
-                    <div>
-                        <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Background URL</span>
-                        <div class="flex gap-2 mt-1.5">
-                            <input v-model="backgroundImage" @change="saveData"
-                                class="flex-1 p-2 border border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-bg text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:border-blue-500">
-                            <button @click="setRandomBg"
-                                class="px-3 bg-gray-100 dark:bg-dark-border text-gray-600 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-sm font-medium transition-colors">Random</button>
-                        </div>
-                    </div>
-                    <div class="mt-4">
+                    <div class="mt-2">
                         <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Theme Color</span>
                         <select v-model="themeColor" @change="saveData" class="w-full p-2 border border-gray-300 dark:border-dark-border rounded mt-1.5 bg-white dark:bg-dark-bg text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:border-blue-500">
                             <option value="blue">Blue</option>
@@ -574,7 +564,6 @@
             setup() {
                 const boards = ref([]);
                 const activeBoardId = ref(null);
-                const backgroundImage = ref('https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop');
                 const user = ref(null);
                 const syncStatus = ref({ show: false, state: '' });
                 const themeColor = ref('blue');
@@ -635,7 +624,6 @@
                         await db.collection("users").doc(user.value.uid).set({
                             boards: boards.value,
                             activeBoardId: activeBoardId.value,
-                            backgroundImage: backgroundImage.value,
                             themeColor: themeColor.value,
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
@@ -646,7 +634,7 @@
 
                 let saveTimeout;
                 const debouncedSave = () => {
-                    localStorage.setItem('myPapalyData_v19', JSON.stringify({ boards: boards.value, activeBoardId: activeBoardId.value, backgroundImage: backgroundImage.value, themeColor: themeColor.value }));
+                    localStorage.setItem('myPapalyData_v19', JSON.stringify({ boards: boards.value, activeBoardId: activeBoardId.value, themeColor: themeColor.value }));
                     if (user.value) { clearTimeout(saveTimeout); syncStatus.value = { show: true, state: 'saving' }; saveTimeout = setTimeout(syncToCloud, 2000); }
                 };
 
@@ -660,7 +648,7 @@
                                 const doc = await db.collection("users").doc(u.uid).get();
                                 if (doc.exists) {
                                     const d = doc.data();
-                                    boards.value = d.boards || []; activeBoardId.value = d.activeBoardId; backgroundImage.value = d.backgroundImage || backgroundImage.value; themeColor.value = d.themeColor || 'blue';
+                                    boards.value = d.boards || []; activeBoardId.value = d.activeBoardId; themeColor.value = d.themeColor || 'blue';
                                     debouncedSave(); setTimeout(initSortable, 100);
                                 } else { syncToCloud(); }
                             }
@@ -683,7 +671,7 @@
                     let saved = localStorage.getItem('myPapalyData_v19');
                     if (!saved) saved = localStorage.getItem('myPapalyData_v18');
                     if (!saved) saved = localStorage.getItem('myPapalyData_v16');
-                    if (saved) { try { const p = JSON.parse(saved); boards.value = p.boards || []; activeBoardId.value = p.activeBoardId; backgroundImage.value = p.backgroundImage || backgroundImage.value; themeColor.value = p.themeColor || 'blue'; } catch (e) { } }
+                    if (saved) { try { const p = JSON.parse(saved); boards.value = p.boards || []; activeBoardId.value = p.activeBoardId; themeColor.value = p.themeColor || 'blue'; } catch (e) { } }
                     if (boards.value.length === 0) initDefaultData();
                 };
                 const initDefaultData = () => { const def = { id: Date.now(), title: 'Home', icon: 'fas fa-bookmark', columns: [{ id: 'c1', width: 280, categories: [{ id: 'cat1', title: 'Example', bookmarks: [{ id: 'b1', title: 'Google', url: 'https://google.com', type: 'link', icon: 'https://www.google.com/s2/favicons?domain=google.com' }] }] }] }; boards.value = [def]; activeBoardId.value = def.id; };
@@ -867,7 +855,6 @@
                 const getFavicon = (url) => `https://www.google.com/s2/favicons?domain=${new URL(url).origin}&sz=32`;
                 const handleImgError = (e) => e.target.src = "https://via.placeholder.com/32?text=•";
                 const openUrl = (url) => { if (url) window.open(url.startsWith('http') ? url : 'https://' + url, '_blank'); };
-                const setRandomBg = () => { backgroundImage.value = `https://source.unsplash.com/random/1920x1080?office,white&t=${Date.now()}`; saveData(); };
                 const resetData = () => { showConfirm("Are you sure you want to clear all data and reset? This cannot be undone.", () => { localStorage.removeItem('myPapalyData_v19'); location.reload(); }, true); };
 
                 // Flat search logic
@@ -896,9 +883,9 @@
                 };
 
                 return {
-                    boards, activeBoardId, activeBoard, backgroundImage, searchQuery, modal, showSettings, modalTitle: computed(() => { if (modal.value.isBoard) return 'New Collection'; if (modal.value.isDivider) return 'Add Divider'; return modal.value.isEdit ? 'Edit' : 'Add'; }),
+                    boards, activeBoardId, activeBoard, searchQuery, modal, showSettings, modalTitle: computed(() => { if (modal.value.isBoard) return 'New Collection'; if (modal.value.isDivider) return 'Add Divider'; return modal.value.isEdit ? 'Edit' : 'Add'; }),
                     modalInput, user, syncStatus, isDark, toasts, showToast, confirmData, closeConfirm, executeConfirm, viewMode, searchOverlayOpen, flatSearchResults, highlightText,
-                    saveData, openCreateBoardModal, deleteBoard, createColumn, deleteColumn, createCategory, deleteCategory, addBookmark, addSubCategory, editBookmark, deleteBookmark, saveModal, handleEnterKey, getModalIcon, getFavicon, handleImgError, openUrl, setRandomBg, startResize, switchBoard, filterCategories, boardContainer: ref(null), resetData,
+                    saveData, openCreateBoardModal, deleteBoard, createColumn, deleteColumn, createCategory, deleteCategory, addBookmark, addSubCategory, editBookmark, deleteBookmark, saveModal, handleEnterKey, getModalIcon, getFavicon, handleImgError, openUrl, startResize, switchBoard, filterCategories, boardContainer: ref(null), resetData,
                     onDragOverCollection, onDragLeaveCollection, onDropToCollection, dragTargetBoardId, onMergeDragOver, onMergeDragLeave, onMergeDrop, mergeTargetCatId,
                     login, logout, exportHtml, importHtml, moveCategoryToCollection, sidebarOpen, themeColor
                 };
