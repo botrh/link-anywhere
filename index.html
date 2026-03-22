@@ -347,7 +347,7 @@
                         <div
                             class="flex justify-between items-center mb-2 px-1 column-drag-handle opacity-0 group-hover/column:opacity-100 transition-opacity">
                             <span
-                                class="text-xs font-bold text-gray-500 uppercase cursor-grab active:cursor-grabbing"><i
+                                class="text-xs font-bold text-gray-500 capitalize cursor-grab active:cursor-grabbing"><i
                                     class="fas fa-grip-vertical mr-1"></i> Column</span>
                             <i @click="deleteColumn(column.id)"
                                 class="fas fa-times hover:text-red-600 cursor-pointer text-xs text-gray-400 font-bold"></i>
@@ -428,8 +428,8 @@
                                     </template>
                                 </div>
                             </div>
-                            <button @click="createCategory(column.id)"
-                                class="w-full py-1 border-2 border-dashed border-gray-300 rounded text-xs text-gray-400 hover:bg-white hover:text-blue-600 font-bold bg-gray-50">+ New</button>
+                            <button @click="createCategory(column.id)" title="Create a new Category in this column" aria-label="New Category"
+                                class="w-full py-1 border-2 border-dashed border-gray-300 rounded text-xs text-gray-400 hover:bg-white hover:text-blue-600 font-bold bg-gray-50">+ New Category</button>
                         </div>
                         <div class="resize-handle" @mousedown="startResize($event, column)"></div>
                     </div>
@@ -780,7 +780,26 @@
                 const deleteBoard = (id) => { if (boards.value.length <= 1 || !confirm("删除画板？")) return; boards.value = boards.value.filter(b => b.id !== id); if (activeBoardId.value === id) activeBoardId.value = boards.value[0].id; saveData(); };
                 const createColumn = () => { if (!activeBoard.value) return; activeBoard.value.columns.push({ id: 'col-' + Date.now(), width: 280, categories: [] }); saveData(); setTimeout(initSortable, 50); nextTick(() => { const el = document.getElementById('boardContainer'); if (el) el.scrollLeft = el.scrollWidth; }); };
                 const deleteColumn = (id) => { if (confirm("删除此列？")) { activeBoard.value.columns = activeBoard.value.columns.filter(c => c.id !== id); saveData(); } };
-                const createCategory = (colId) => { const col = activeBoard.value.columns.find(c => c.id === colId); if (col) { col.categories.push({ id: 'cat-' + Date.now(), title: '新分类', bookmarks: [] }); saveData(); setTimeout(initSortable, 50); } };
+                const createCategory = (colId) => {
+                    const col = activeBoard.value.columns.find(c => c.id === colId);
+                    if (!col) return;
+                    const newId = 'cat-' + Date.now();
+                    col.categories.push({ id: newId, title: 'New Category', bookmarks: [] });
+                    saveData();
+                    setTimeout(initSortable, 50);
+                    nextTick(() => {
+                        // small delay to ensure DOM rendered
+                        setTimeout(() => {
+                            const input = document.querySelector(`[data-cat-id="${newId}"] input`);
+                            if (input) {
+                                input.focus();
+                                // place caret at end
+                                const val = input.value || '';
+                                input.setSelectionRange(val.length, val.length);
+                            }
+                        }, 40);
+                    });
+                };
                 const deleteCategory = (colId, catId) => { if (confirm("删除此卡片？")) { const col = activeBoard.value.columns.find(c => c.id === colId); col.categories = col.categories.filter(c => c.id !== catId); saveData(); } };
                 const addBookmark = (catId) => { modal.value = { show: true, categoryId: catId, data: { title: '', url: '', icon: '', note: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
                 const addSubCategory = (catId) => { modal.value = { show: true, isDivider: true, categoryId: catId, data: { title: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
