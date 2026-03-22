@@ -282,45 +282,34 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bookmark-list p-1 min-h-[40px] bg-white transition-colors dark:bg-dark-panel flex-1" 
-                                    :class="{'flex flex-wrap gap-2 content-start': viewMode === 'card'}" :data-cat-id="category.id">
-                                    <div v-if="category.bookmarks.length === 0" class="text-center py-4 text-xs text-gray-400 dark:text-dark-muted border border-dashed border-gray-200 dark:border-dark-border m-2 rounded bg-gray-50 dark:bg-dark-bg">
+                                <div class="subcategory-list p-1 min-h-[40px] bg-white transition-colors dark:bg-dark-panel flex-1" :data-cat-id="category.id">
+                                    <div v-if="!category.subcategories || category.subcategories.length === 0" class="text-center py-4 text-xs text-gray-400 dark:text-dark-muted border border-dashed border-gray-200 dark:border-dark-border m-2 rounded bg-gray-50 dark:bg-dark-bg">
                                         Drag & drop links here
                                     </div>
-                                    <template v-for="bookmark in category.bookmarks" :key="bookmark.id">
-                                        <div v-if="bookmark.type === 'divider'" :data-id="bookmark.id"
-                                            class="relative group/divider mt-2 mb-1 px-1 flex items-center cursor-move select-none">
-                                            <div class="h-px w-2 bg-gray-400 mr-2"></div><span
-                                                class="text-xs font-black uppercase text-gray-500 flex-1 truncate">{{
-                                                bookmark.title }}</span>
-                                            <div class="h-px flex-1 bg-gray-400 ml-2"></div>
+                                    <div v-for="sub in category.subcategories" :key="sub.id" class="subcategory-wrapper relative" :data-sub-id="sub.id">
+                                        <div v-if="sub.title !== null" class="subcat-drag-handle relative group/divider mt-2 mb-1 px-1 flex items-center cursor-move select-none">
+                                            <div class="h-px w-2 bg-gray-400 mr-2"></div><span class="text-xs font-black uppercase text-gray-500 flex-1 truncate">{{ sub.title }}</span><div class="h-px flex-1 bg-gray-400 ml-2"></div>
+                                            <i @click.stop="editSubcategory(category.id, sub)" class="fas fa-pen text-[9px] p-1 cursor-pointer text-gray-400 hover:text-blue-600 hidden group-hover/divider:block bg-white dark:bg-dark-bg absolute right-6"></i>
+                                            <i @click.stop="deleteSubcategory(category.id, sub.id)" class="fas fa-times text-[9px] p-1 cursor-pointer text-gray-400 hover:text-red-600 hidden group-hover/divider:block bg-white dark:bg-dark-bg absolute right-1"></i>
                                         </div>
-                                        <div v-else :data-id="bookmark.id"
-                                            class="bookmark-item relative group flex items-center px-2 py-1.5 mb-0 rounded hover:bg-blue-50 dark:hover:bg-dark-border cursor-pointer border border-transparent hover:border-blue-300 transition-colors"
-                                            :class="viewMode === 'card' ? 'w-[calc(50%-0.25rem)] flex-col !items-start bg-gray-50 dark:bg-dark-bg !border-gray-200 dark:!border-dark-border' : ''">
-                                            <div class="flex items-center w-full" :class="viewMode === 'card' ? 'mb-1' : ''">
-                                                <img :src="bookmark.icon || getFavicon(bookmark.url)"
-                                                    class="w-4 h-4 mr-2 rounded-sm shrink-0" @error="handleImgError">
-                                                <div class="flex-1 overflow-hidden" @click="openUrl(bookmark.url)">
-                                                    <div
-                                                        class="truncate compact-text font-medium text-gray-800 dark:text-gray-200 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
-                                                        {{ bookmark.title }}</div>
-                                                    <div v-if="bookmark.note && viewMode === 'list'" class="truncate compact-text text-gray-500 dark:text-dark-muted text-xs mt-0.5">
-                                                        {{ bookmark.note }}</div>
+                                        <div class="bookmark-list min-h-[10px]" :class="{'flex flex-wrap gap-2 content-start': viewMode === 'card'}" :data-cat-id="category.id" :data-sub-id="sub.id">
+                                            <template v-for="bookmark in sub.bookmarks" :key="bookmark.id">
+                                                <div :data-id="bookmark.id" class="bookmark-item relative group flex items-center px-2 py-1.5 mb-0 rounded hover:bg-blue-50 dark:hover:bg-dark-border cursor-pointer border border-transparent hover:border-blue-300 transition-colors" :class="viewMode === 'card' ? 'w-[calc(50%-0.25rem)] flex-col !items-start bg-gray-50 dark:bg-dark-bg !border-gray-200 dark:!border-dark-border' : ''">
+                                                    <div class="flex items-center w-full" :class="viewMode === 'card' ? 'mb-1' : ''">
+                                                        <img :src="bookmark.icon || getFavicon(bookmark.url)" class="w-4 h-4 mr-2 rounded-sm shrink-0" @error="handleImgError">
+                                                        <div class="flex-1 overflow-hidden" @click="openUrl(bookmark.url)">
+                                                            <div class="truncate compact-text font-medium text-gray-800 dark:text-gray-200 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{{ bookmark.title }}</div>
+                                                            <div v-if="bookmark.note && viewMode === 'list'" class="truncate compact-text text-gray-500 dark:text-dark-muted text-xs mt-0.5">{{ bookmark.note }}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="bookmark.note && viewMode === 'card'" class="w-full text-xs text-gray-500 dark:text-dark-muted line-clamp-2 leading-relaxed">{{ bookmark.note }}</div>
+                                                    <div class="absolute right-1 flex opacity-0 group-hover:opacity-100 bg-white rounded shadow-sm border border-gray-300">
+                                                        <i @click.stop="editBookmark(category.id, sub.id, bookmark)" class="fas fa-pen text-[9px] p-1 cursor-pointer text-gray-500 hover:text-blue-600 border-r border-gray-200"></i><i @click.stop="deleteBookmark(category.id, sub.id, bookmark.id)" class="fas fa-times text-[9px] p-1 cursor-pointer text-gray-500 hover:text-red-600"></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div v-if="bookmark.note && viewMode === 'card'" class="w-full text-xs text-gray-500 dark:text-dark-muted line-clamp-2 leading-relaxed">
-                                                {{ bookmark.note }}
-                                            </div>
-                                            <div
-                                                class="absolute right-1 flex opacity-0 group-hover:opacity-100 bg-white rounded shadow-sm border border-gray-300">
-                                                <i @click.stop="editBookmark(category.id, bookmark)"
-                                                    class="fas fa-pen text-[9px] p-1 cursor-pointer text-gray-500 hover:text-blue-600 border-r border-gray-200"></i><i
-                                                    @click.stop="deleteBookmark(category.id, bookmark.id)"
-                                                    class="fas fa-times text-[9px] p-1 cursor-pointer text-gray-500 hover:text-red-600"></i>
-                                            </div>
+                                            </template>
                                         </div>
-                                    </template>
+                                    </div>
                                 </div>
                                 <div class="px-2 pb-2">
                                     <button @click="addBookmark(category.id)" title="Add a new bookmark to this category" aria-label="New Bookmark"
@@ -680,15 +669,45 @@
                     if (!saved) saved = localStorage.getItem('myPapalyData_v18');
                     if (!saved) saved = localStorage.getItem('myPapalyData_v16');
                     if (saved) { try { const p = JSON.parse(saved); boards.value = p.boards || []; activeBoardId.value = p.activeBoardId; themeColor.value = p.themeColor || 'blue'; } catch (e) { } }
+                    
+                    boards.value.forEach(b => {
+                        if(b.columns) {
+                            b.columns.forEach(col => {
+                                if(col.categories) {
+                                    col.categories.forEach(cat => {
+                                        if (cat.bookmarks) {
+                                            const subcategories = [];
+                                            let currentSub = { id: 'sub-' + Math.random().toString(36).substr(2,9), title: null, bookmarks: [] };
+                                            subcategories.push(currentSub);
+                                            cat.bookmarks.forEach(bm => {
+                                                if (bm.type === 'divider') {
+                                                    if(currentSub.title === null && currentSub.bookmarks.length === 0 && subcategories.length > 1) {
+                                                        subcategories.pop();
+                                                    }
+                                                    currentSub = { id: bm.id, title: bm.title, bookmarks: [] };
+                                                    subcategories.push(currentSub);
+                                                } else {
+                                                    currentSub.bookmarks.push(bm);
+                                                }
+                                            });
+                                            cat.subcategories = subcategories.filter(s => s.bookmarks.length > 0 || s.title !== null || subcategories.length === 1);
+                                            delete cat.bookmarks;
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                    
                     if (boards.value.length === 0) initDefaultData();
                 };
-                const initDefaultData = () => { const def = { id: Date.now(), title: 'Home', icon: 'fas fa-bookmark', columns: [{ id: 'c1', width: 280, categories: [{ id: 'cat1', title: 'Example', bookmarks: [{ id: 'b1', title: 'Google', url: 'https://google.com', type: 'link', icon: 'https://www.google.com/s2/favicons?domain=google.com' }] }] }] }; boards.value = [def]; activeBoardId.value = def.id; };
+                const initDefaultData = () => { const def = { id: Date.now(), title: 'Home', icon: 'fas fa-bookmark', columns: [{ id: 'c1', width: 280, categories: [{ id: 'cat1', title: 'Example', subcategories: [{ id: 'sub1', title: null, bookmarks: [{ id: 'b1', title: 'Google', url: 'https://google.com', type: 'link', icon: 'https://www.google.com/s2/favicons?domain=google.com' }] }] }] }] }; boards.value = [def]; activeBoardId.value = def.id; };
 
                 // --- Import / Export (Added Back) ---
                 const distributeCategoriesToColumns = (categories, columnCount = 4) => {
                     const columns = Array.from({ length: columnCount }, () => ({ id: 'col-' + Math.random().toString(36).substr(2, 9), width: 280, categories: [], _h: 0 }));
                     categories.forEach(cat => {
-                        const estimatedHeight = 40 + (cat.bookmarks.length * 24);
+                        const estimatedHeight = 40 + (cat.subcategories ? cat.subcategories.reduce((acc, sub) => acc + (sub.title ? 30 : 0) + (sub.bookmarks ? sub.bookmarks.length * 24 : 0), 0) : 0);
                         let minColIndex = 0; let minHeight = columns[0]._h;
                         for (let i = 1; i < columns.length; i++) { if (columns[i]._h < minHeight) { minHeight = columns[i]._h; minColIndex = i; } }
                         columns[minColIndex].categories.push(cat); columns[minColIndex]._h += estimatedHeight;
@@ -704,22 +723,25 @@
                         const content = ev.target.result; const parser = new DOMParser(); const doc = parser.parseFromString(content, 'text/html');
                         let rootDl = doc.querySelector('dl'); if (!rootDl) return alert("无效文件");
                         const newBoards = [];
-                        const parseBookmarks = (dl) => {
-                            const bms = [];
+                        const parseBookmarksToSubcats = (dl) => {
+                            const subcategories = [];
+                            let currentSub = { id: 'sub-' + Math.random(), title: null, bookmarks: [] };
+                            subcategories.push(currentSub);
                             Array.from(dl.children).forEach(node => {
                                 if (node.tagName === 'DT') {
                                     const a = node.querySelector('a'); const h3 = node.querySelector('h3'); const subDl = node.querySelector('dl');
                                     if (a) {
                                         const icon = a.getAttribute('data-icon') || `https://www.google.com/s2/favicons?domain=${new URL(a.href).origin}&sz=32`;
                                         const note = a.getAttribute('data-note') || '';
-                                        bms.push({ id: 'bm-' + Math.random(), title: a.textContent.trim(), url: a.href, type: 'link', icon, note });
+                                        currentSub.bookmarks.push({ id: 'bm-' + Math.random(), title: a.textContent.trim(), url: a.href, type: 'link', icon, note });
                                     } else if (h3) {
-                                        bms.push({ id: 'div-' + Math.random(), title: h3.textContent.trim(), type: 'divider' });
-                                        if (subDl) bms.push(...parseBookmarks(subDl));
+                                        currentSub = { id: 'sub-' + Math.random(), title: h3.textContent.trim(), bookmarks: [] };
+                                        subcategories.push(currentSub);
+                                        if (subDl) currentSub.bookmarks.push(...parseBookmarksToSubcats(subDl).flatMap(s => s.bookmarks));
                                     }
                                 }
                             });
-                            return bms;
+                            return subcategories.filter(s => s.bookmarks.length > 0 || s.title !== null || subcategories.length === 1);
                         };
                         Array.from(rootDl.children).forEach(dt => {
                             if (dt.tagName === 'DT') {
@@ -729,8 +751,8 @@
                                     Array.from(dl.children).forEach(catDt => {
                                         if (catDt.tagName === 'DT') {
                                             const catH3 = catDt.querySelector('h3'); const catDl = catDt.querySelector('dl');
-                                            if (catH3 && catDl) { allCategories.push({ id: 'cat-' + Math.random().toString(36).substr(2, 9), title: catH3.textContent.trim(), bookmarks: parseBookmarks(catDl) }); }
-                                            else { const link = catDt.querySelector('a'); if (link) { let unc = allCategories.find(c => c.title === "未分类"); if (!unc) { unc = { id: 'cat-uncat', title: "未分类", bookmarks: [] }; allCategories.push(unc); } unc.bookmarks.push({ id: 'bm-' + Math.random(), title: link.textContent.trim(), url: link.href, type: 'link' }); } }
+                                            if (catH3 && catDl) { allCategories.push({ id: 'cat-' + Math.random().toString(36).substr(2, 9), title: catH3.textContent.trim(), subcategories: parseBookmarksToSubcats(catDl) }); }
+                                            else { const link = catDt.querySelector('a'); if (link) { let unc = allCategories.find(c => c.title === "未分类"); if (!unc) { unc = { id: 'cat-uncat', title: "未分类", subcategories: [{id: 'sub-uncat', title: null, bookmarks: []}] }; allCategories.push(unc); } unc.subcategories[0].bookmarks.push({ id: 'bm-' + Math.random(), title: link.textContent.trim(), url: link.href, type: 'link' }); } }
                                         }
                                     });
                                     const distributedColumns = distributeCategoriesToColumns(allCategories, 4);
@@ -758,7 +780,7 @@
                     let html = `<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">\n<TITLE>Bookmarks</TITLE>\n<H1>Bookmarks</H1>\n<DL><p>\n`;
                     boards.value.forEach(board => {
                         html += `    <DT><H3>${board.title}</H3>\n    <DL><p>\n`;
-                        board.columns.forEach(col => { col.categories.forEach(cat => { html += `        <DT><H3>${cat.title}</H3>\n        <DL><p>\n`; cat.bookmarks.forEach(bm => { if (bm.type === 'link') { const iconAttr = bm.icon ? ` data-icon="${bm.icon}"` : ''; const noteAttr = bm.note ? ` data-note="${bm.note.replace(/"/g, '&quot;')}"` : ''; html += `            <DT><A HREF="${bm.url}"${iconAttr}${noteAttr}>${bm.title}</A>\n`; } else if (bm.type === 'divider') html += `            <DT><H3>${bm.title}</H3><DL></DL>\n`; }); html += `        </DL><p>\n`; }); });
+                        board.columns.forEach(col => { col.categories.forEach(cat => { html += `        <DT><H3>${cat.title}</H3>\n        <DL><p>\n`; cat.subcategories.forEach(sub => { if (sub.title !== null) html += `            <DT><H3>${sub.title}</H3><DL></DL>\n`; sub.bookmarks.forEach(bm => { const iconAttr = bm.icon ? ` data-icon="${bm.icon}"` : ''; const noteAttr = bm.note ? ` data-note="${bm.note.replace(/"/g, '&quot;')}"` : ''; html += `            <DT><A HREF="${bm.url}"${iconAttr}${noteAttr}>${bm.title}</A>\n`; }); }); html += `        </DL><p>\n`; }); });
                         html += `    </DL><p>\n`;
                     });
                     html += `</DL>`;
@@ -789,8 +811,7 @@
                     const board = boards.value.find(b => b.id === activeBoardId.value);
                     let targetCat; for (const col of board.columns) { targetCat = col.categories.find(c => c.id === targetCatId); if (targetCat) break; }
                     if (targetCat) {
-                        targetCat.bookmarks.push({ id: 'div-' + Date.now(), title: srcCat.title, type: 'divider' });
-                        targetCat.bookmarks.push(...JSON.parse(JSON.stringify(srcCat.bookmarks)));
+                        targetCat.subcategories.push({ id: 'sub-' + Date.now(), title: srcCat.title, bookmarks: JSON.parse(JSON.stringify(srcCat.subcategories.flatMap(s => s.bookmarks))) });
                         const srcCol = board.columns.find(c => c.id === columnId);
                         srcCol.categories = srcCol.categories.filter(c => c.id !== srcCat.id);
                         saveData(); setTimeout(initSortable, 50);
@@ -804,7 +825,8 @@
                         const colContainer = document.getElementById('columns-container');
                         if (colContainer) { new Sortable(colContainer, { animation: 150, handle: '.column-drag-handle', draggable: '.column-wrapper', onEnd: (evt) => { const item = activeBoard.value.columns.splice(evt.oldIndex, 1)[0]; activeBoard.value.columns.splice(evt.newIndex, 0, item); saveData(); } }); }
                         document.querySelectorAll('.category-sortable-area').forEach(el => { new Sortable(el, { group: 'shared-categories', animation: 150, handle: '.category-drag-handle', draggable: '.category-card', ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen', fallbackOnBody: true, onStart: (evt) => { try { const fromColId = evt.from.dataset.colId; const fromCol = activeBoard.value.columns.find(c => c.id == fromColId); if (fromCol) { draggingCategoryInfo.value = { columnId: fromColId, category: fromCol.categories[evt.oldIndex] }; } } catch (e) { draggingCategoryInfo.value = null; } }, onEnd: (evt) => { const fromCol = activeBoard.value.columns.find(c => c.id == evt.from.dataset.colId); const toCol = activeBoard.value.columns.find(c => c.id == evt.to.dataset.colId); if (fromCol && toCol) { const item = fromCol.categories.splice(evt.oldIndex, 1)[0]; toCol.categories.splice(evt.newIndex, 0, item); saveData(); } draggingCategoryInfo.value = null; mergeTargetCatId.value = null; } }); });
-                        document.querySelectorAll('.bookmark-list').forEach(el => { new Sortable(el, { group: 'shared-bookmarks', animation: 100, ghostClass: 'sortable-ghost', onEnd: (evt) => { let fromCat, toCat; for (const col of activeBoard.value.columns) { if (!fromCat) fromCat = col.categories.find(c => c.id == evt.from.dataset.catId); if (!toCat) toCat = col.categories.find(c => c.id == evt.to.dataset.catId); } if (fromCat && toCat) { const item = fromCat.bookmarks.splice(evt.oldIndex, 1)[0]; toCat.bookmarks.splice(evt.newIndex, 0, item); saveData(); } } }); });
+                        document.querySelectorAll('.subcategory-list').forEach(el => { new Sortable(el, { group: 'shared-subcategories', animation: 150, handle: '.subcat-drag-handle', draggable: '.subcategory-wrapper', fallbackOnBody: true, onEnd: (evt) => { let fromCat, toCat; for (const col of activeBoard.value.columns) { if (!fromCat) fromCat = col.categories.find(c => c.id == evt.from.dataset.catId); if (!toCat) toCat = col.categories.find(c => c.id == evt.to.dataset.catId); } if (fromCat && toCat) { const item = fromCat.subcategories.splice(evt.oldIndex, 1)[0]; toCat.subcategories.splice(evt.newIndex, 0, item); saveData(); } } }); });
+                        document.querySelectorAll('.bookmark-list').forEach(el => { new Sortable(el, { group: 'shared-bookmarks', animation: 100, ghostClass: 'sortable-ghost', onEnd: (evt) => { let fromSub, toSub; for (const col of activeBoard.value.columns) { const fC = col.categories.find(c => c.id == evt.from.dataset.catId); if (fC && !fromSub) fromSub = fC.subcategories.find(s => s.id == evt.from.dataset.subId); const tC = col.categories.find(c => c.id == evt.to.dataset.catId); if (tC && !toSub) toSub = tC.subcategories.find(s => s.id == evt.to.dataset.subId); } if (fromSub && toSub) { const item = fromSub.bookmarks.splice(evt.oldIndex, 1)[0]; toSub.bookmarks.splice(evt.newIndex, 0, item); saveData(); } } }); });
                     });
                 };
                 const switchBoard = (id) => { activeBoardId.value = id; saveData(); setTimeout(initSortable, 100); };
@@ -829,16 +851,14 @@
                     }
                     if (!col) return;
                     const newId = 'cat-' + Date.now();
-                    col.categories.push({ id: newId, title: 'New Category', bookmarks: [] });
+                    col.categories.push({ id: newId, title: 'New Category', subcategories: [{ id: 'sub-' + Date.now(), title: null, bookmarks: [] }] });
                     saveData();
                     setTimeout(initSortable, 50);
                     nextTick(() => {
-                        // small delay to ensure DOM rendered
                         setTimeout(() => {
                             const input = document.querySelector(`[data-cat-id="${newId}"] input`);
                             if (input) {
                                 input.focus();
-                                // place caret at end
                                 const val = input.value || '';
                                 input.setSelectionRange(val.length, val.length);
                             }
@@ -846,22 +866,46 @@
                     });
                 };
                 const deleteCategory = (colId, catId) => { showConfirm("Delete this category and its bookmarks?", () => { const col = activeBoard.value.columns.find(c => c.id === colId); col.categories = col.categories.filter(c => c.id !== catId); saveData(); }, true); };
-                const addBookmark = (catId) => { modal.value = { show: true, categoryId: catId, data: { title: '', url: '', icon: '', note: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
-                const addSubCategory = (catId) => { modal.value = { show: true, isDivider: true, categoryId: catId, data: { title: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
-                const editBookmark = (catId, bm) => { modal.value = { show: true, isEdit: true, isDivider: bm.type === 'divider', categoryId: catId, data: { ...bm, icon: bm.icon || '', note: bm.note || '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
-                const deleteBookmark = (catId, bmId) => { for (const col of activeBoard.value.columns) { const cat = col.categories.find(c => c.id === catId); if (cat) { cat.bookmarks = cat.bookmarks.filter(b => b.id !== bmId); break; } } saveData(); };
+                const addBookmark = (catId) => { modal.value = { show: true, categoryId: catId, subId: null, data: { title: '', url: '', icon: '', note: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
+                const addSubCategory = (catId) => { modal.value = { show: true, isDivider: true, isEdit: false, categoryId: catId, data: { title: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
+                const editSubcategory = (catId, sub) => { modal.value = { show: true, isDivider: true, isEdit: true, categoryId: catId, data: { id: sub.id, title: sub.title } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
+                const deleteSubcategory = (catId, subId) => { showConfirm("Delete this subcategory and all its bookmarks?", () => { for (const col of activeBoard.value.columns) { const cat = col.categories.find(c => c.id === catId); if (cat) { cat.subcategories = cat.subcategories.filter(s => s.id !== subId); if (cat.subcategories.length === 0) { cat.subcategories.push({ id: 'sub-' + Date.now(), title: null, bookmarks: [] }); } break; } } saveData(); }, true); };
+                const editBookmark = (catId, subId, bm) => { modal.value = { show: true, isEdit: true, isDivider: false, categoryId: catId, subId: subId, data: { ...bm, icon: bm.icon || '', note: bm.note || '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
+                const deleteBookmark = (catId, subId, bmId) => { for (const col of activeBoard.value.columns) { const cat = col.categories.find(c => c.id === catId); if (cat) { const sub = cat.subcategories.find(s => s.id === subId); if (sub) { sub.bookmarks = sub.bookmarks.filter(b => b.id !== bmId); break; } } } saveData(); };
                 const handleEnterKey = () => { if (modal.value.isBoard || modal.value.isDivider || modal.value.data.title) saveModal(); };
                 const saveModal = () => {
-                    const { categoryId, data, isEdit, isBoard, isDivider } = modal.value;
+                    const { categoryId, subId, data, isEdit, isBoard, isDivider } = modal.value;
                     if (isBoard) { if (!data.title.trim()) return; const newBoard = { id: Date.now(), title: data.title, icon: 'fas fa-bookmark', columns: [{ id: 'c1', width: 280, categories: [] }] }; boards.value.push(newBoard); activeBoardId.value = newBoard.id; saveData(); }
                     else {
                         let targetCat; for (const col of activeBoard.value.columns) { targetCat = col.categories.find(c => c.id === categoryId); if (targetCat) break; }
                         if (!targetCat) return;
-                        if (!isDivider && !data.url) return;
-                        if (!isDivider && !data.url.startsWith('http')) data.url = 'https://' + data.url;
-                        if (!data.title && !isDivider) data.title = new URL(data.url).hostname.replace('www.', '');
-                        if (isEdit) { const idx = targetCat.bookmarks.findIndex(b => b.id === data.id); if (idx !== -1) targetCat.bookmarks[idx] = { ...data }; }
-                        else { targetCat.bookmarks.push({ id: 'bm-' + Date.now(), title: data.title, url: isDivider ? undefined : data.url, type: isDivider ? 'divider' : 'link', icon: isDivider ? undefined : (data.icon || ''), note: isDivider ? undefined : (data.note || '') }); }
+                        if (isDivider) {
+                            if (!data.title.trim()) return;
+                            if (isEdit) {
+                                const sub = targetCat.subcategories.find(s => s.id === data.id);
+                                if (sub) sub.title = data.title;
+                            } else {
+                                targetCat.subcategories.push({ id: 'sub-' + Date.now(), title: data.title, bookmarks: [] });
+                                setTimeout(initSortable, 50);
+                            }
+                        } else {
+                            if (!data.url) return;
+                            if (!data.url.startsWith('http')) data.url = 'https://' + data.url;
+                            if (!data.title) data.title = new URL(data.url).hostname.replace('www.', '');
+                            let targetSub;
+                            if (subId) {
+                                targetSub = targetCat.subcategories.find(s => s.id === subId);
+                            } else {
+                                targetSub = targetCat.subcategories[targetCat.subcategories.length - 1];
+                            }
+                            if (!targetSub && targetCat.subcategories.length > 0) targetSub = targetCat.subcategories[0];
+                            if (isEdit && targetSub) {
+                                const idx = targetSub.bookmarks.findIndex(b => b.id === data.id);
+                                if (idx !== -1) targetSub.bookmarks[idx] = { ...data };
+                            } else if (targetSub) {
+                                targetSub.bookmarks.push({ id: 'bm-' + Date.now(), title: data.title, url: data.url, type: 'link', icon: data.icon || '', note: data.note || '' });
+                            }
+                        }
                         saveData();
                     }
                     modal.value.show = false;
@@ -873,7 +917,6 @@
                 const openUrl = (url) => { if (url) window.open(url.startsWith('http') ? url : 'https://' + url, '_blank'); };
                 const resetData = () => { showConfirm("Are you sure you want to clear all data and reset? This cannot be undone.", () => { localStorage.removeItem('myPapalyData_v19'); location.reload(); }, true); };
 
-                // Flat search logic
                 const flatSearchResults = computed(() => {
                     if (!searchQuery.value) return [];
                     const q = searchQuery.value.toLowerCase();
@@ -881,11 +924,15 @@
                     boards.value.forEach(b => {
                         b.columns.forEach(col => {
                             col.categories.forEach(cat => {
-                                cat.bookmarks.forEach(bm => {
-                                    if (bm.type !== 'divider' && (bm.title.toLowerCase().includes(q) || (bm.url && bm.url.toLowerCase().includes(q)))) {
-                                        results.push({ board: b.title, category: cat.title, bookmark: bm });
-                                    }
-                                });
+                                if (cat.subcategories) {
+                                    cat.subcategories.forEach(sub => {
+                                        sub.bookmarks.forEach(bm => {
+                                            if (bm.title.toLowerCase().includes(q) || (bm.url && bm.url.toLowerCase().includes(q))) {
+                                                results.push({ board: b.title, category: cat.title + (sub.title ? ` > ${sub.title}` : ''), bookmark: bm });
+                                            }
+                                        });
+                                    });
+                                }
                             });
                         });
                     });
@@ -901,7 +948,7 @@
                 return {
                     boards, activeBoardId, activeBoard, searchQuery, modal, showSettings, modalTitle: computed(() => { if (modal.value.isBoard) return 'New Collection'; if (modal.value.isDivider) return 'Add Divider'; return modal.value.isEdit ? 'Edit' : 'Add'; }),
                     modalInput, user, syncStatus, isDark, toasts, showToast, confirmData, closeConfirm, executeConfirm, viewMode, searchOverlayOpen, flatSearchResults, highlightText,
-                    saveData, openCreateBoardModal, deleteBoard, createColumn, deleteColumn, createCategory, deleteCategory, addBookmark, addSubCategory, editBookmark, deleteBookmark, saveModal, handleEnterKey, getModalIcon, getFavicon, handleImgError, openUrl, startResize, switchBoard, filterCategories, boardContainer: ref(null), resetData,
+                    saveData, openCreateBoardModal, deleteBoard, createColumn, deleteColumn, createCategory, deleteCategory, addBookmark, addSubCategory, editSubcategory, deleteSubcategory, editBookmark, deleteBookmark, saveModal, handleEnterKey, getModalIcon, getFavicon, handleImgError, openUrl, startResize, switchBoard, filterCategories, boardContainer: ref(null), resetData,
                     onDragOverCollection, onDragLeaveCollection, onDropToCollection, dragTargetBoardId, onMergeDragOver, onMergeDragLeave, onMergeDrop, mergeTargetCatId,
                     login, logout, exportHtml, importHtml, moveCategoryToCollection, sidebarOpen, themeColor
                 };
