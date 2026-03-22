@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,512 +10,504 @@
     <script src="https://cdn.staticfile.net/Sortable/1.15.0/Sortable.min.js"></script>
     <link href="https://cdn.staticfile.net/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        dark: { bg: '#121212', panel: '#1e1e1e', border: '#2d2d2d', text: '#e0e0e0', muted: '#9e9e9e' }
-                    }
-                }
-            }
-        }
-    </script>
-
+    <script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } } }</script>
     <style>
         :root {
-            --bg-color: #f3f4f6;
-            --panel-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-color: #1f2937;
-            --text-muted: #6b7280;
-            --hover-bg: #f9fafb;
-            --glass-bg: rgba(255, 255, 255, 0.85);
+            --bg: #f0f2f5; --panel: #ffffff; --border: #e2e5ea;
+            --text: #1a1a2e; --muted: #6b7280; --hover: #f5f7fa;
+            --nav-bg: #1e2433; --nav-text: #9aa0b0; --nav-hover: #2d3448;
         }
-
         .dark {
-            --bg-color: #121212;
-            --panel-bg: #1e1e1e;
-            --border-color: #2d2d2d;
-            --text-color: #e0e0e0;
-            --text-muted: #9e9e9e;
-            --hover-bg: #2a2a2a;
-            --glass-bg: rgba(30, 30, 30, 0.85);
+            --bg: #0f1117; --panel: #1a1d27; --border: #2a2d3a;
+            --text: #e2e5ea; --muted: #8b92a5; --hover: #22263a;
+            --nav-bg: #0d0f18; --nav-text: #8b92a5; --nav-hover: #1a1d27;
         }
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
 
-        body {
-            font-family: "Inter", sans-serif;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+        /* ── Nav ── */
+        .top-nav { background: var(--nav-bg); display: flex; align-items: stretch; height: 48px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+        .nav-logo { display: flex; align-items: center; padding: 0 16px; border-right: 1px solid rgba(255,255,255,.08); flex-shrink: 0; gap: 8px; }
+        .nav-logo span { color: #fff; font-weight: 700; font-size: 13px; letter-spacing: .04em; }
+        .nav-tabs { display: flex; align-items: stretch; flex: 1; overflow-x: auto; }
+        .nav-tabs::-webkit-scrollbar { display: none; }
+        .nav-tab { display: flex; align-items: center; padding: 0 16px; color: var(--nav-text); font-size: 13px; font-weight: 500; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; transition: all .15s; gap: 6px; }
+        .nav-tab:hover { color: #fff; background: var(--nav-hover); }
+        .nav-tab.active { color: #fff; border-bottom-color: #4f8ef7; }
+        .nav-tab .x-btn { opacity: 0; font-size: 10px; color: #8b92a5; transition: opacity .15s; }
+        .nav-tab:hover .x-btn { opacity: 1; }
+        .nav-actions { display: flex; align-items: center; gap: 2px; padding: 0 10px; border-left: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
+        .nav-btn { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #9aa0b0; cursor: pointer; transition: all .15s; background: none; border: none; }
+        .nav-btn:hover { color: #fff; background: rgba(255,255,255,.1); }
+        .nav-sync { display: flex; align-items: center; padding: 0 12px; border-left: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
 
-        .card-panel {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: all 0.2s ease;
-        }
-        
-        .card-panel:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            transform: translateY(-2px);
-        }
+        /* ── Subbar ── */
+        .subbar { display: flex; align-items: center; justify-content: space-between; padding: 6px 20px; background: var(--panel); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .subbar input { background: transparent; border: none; border-bottom: 2px solid transparent; font-size: 13px; font-weight: 700; color: var(--text); outline: none; transition: border-color .2s; padding-bottom: 1px; }
+        .subbar input:focus { border-bottom-color: #4f8ef7; }
+        .subbar-btns { display: flex; gap: 8px; }
+        .subbar-btn { display: flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 5px; border: 1px solid var(--border); background: var(--hover); color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: all .15s; }
+        .subbar-btn:hover { border-color: #4f8ef7; color: #4f8ef7; }
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* ── Board area ── */
+        .board-area { flex: 1; overflow-x: auto; overflow-y: hidden; padding: 16px; }
+        .board-area::-webkit-scrollbar { height: 6px; }
+        .board-area::-webkit-scrollbar-track { background: var(--bg); }
+        .board-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        .columns-wrap { display: flex; height: 100%; gap: 16px; align-items: flex-start; padding-bottom: 16px; }
 
-        .sortable-ghost { opacity: 0.5; background: var(--hover-bg); border: 2px dashed #94a3b8; }
-        .sortable-chosen { transform: scale(0.98); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+        /* ── Column ── */
+        .column-wrapper { flex-shrink: 0; display: flex; flex-direction: column; max-height: 100%; position: relative; }
+        .col-handle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 4px; opacity: 0; transition: opacity .15s; }
+        .column-wrapper:hover .col-handle { opacity: 1; }
 
-        .resize-handle { cursor: col-resize; width: 14px; right: -7px; top: 0; bottom: 0; position: absolute; z-index: 20; }
-        .resize-handle:hover { background: rgba(59, 130, 246, 0.2); }
+        /* ── Category card ── */
+        .cat-card { background: var(--panel); border: 1px solid var(--border); border-radius: 7px; overflow: hidden; flex-shrink: 0; transition: box-shadow .2s; }
+        .cat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+        .cat-head { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; }
+        .cat-head input { background: transparent; border: none; outline: none; font-weight: 700; font-size: 11px; color: #fff; text-transform: uppercase; letter-spacing: .06em; width: 100%; }
+        .cat-head input::placeholder { color: rgba(255,255,255,.5); }
+        .cat-head-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+        .cat-head-btn { width: 20px; height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.55); cursor: pointer; transition: all .15s; background: none; border: none; opacity: 0; }
+        .cat-card:hover .cat-head-btn { opacity: 1; }
+        .cat-head-btn:hover { color: #fff; background: rgba(255,255,255,.2); }
+        /* always show ellipsis btn */
+        .cat-head-btn.always { opacity: 1; }
 
-        .drag-over-collection { background-color: rgba(59, 130, 246, 0.1) !important; border-left: 4px solid #2563eb !important; }
-        .drag-merge-target { border: 2px dashed #10b981 !important; background-color: rgba(16, 185, 129, 0.1) !important; transform: scale(1.02); }
+        /* Category colors */
+        .cc-blue   { background: #2563eb; }
+        .cc-indigo { background: #4f46e5; }
+        .cc-purple { background: #7c3aed; }
+        .cc-pink   { background: #db2777; }
+        .cc-red    { background: #dc2626; }
+        .cc-orange { background: #ea580c; }
+        .cc-yellow { background: #ca8a04; }
+        .cc-green  { background: #16a34a; }
+        .cc-teal   { background: #0d9488; }
+        .cc-gray   { background: #4b5563; }
 
-        .compact-text { font-size: 0.8rem; line-height: 1.2rem; }
-        .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; }
+        /* Color picker popup */
+        .color-picker { position: absolute; right: 0; top: 26px; display: none; flex-wrap: wrap; gap: 5px; padding: 8px; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.15); z-index: 100; width: 116px; }
+        .color-picker-wrap:hover .color-picker { display: flex; }
+        .color-dot { width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform .1s; }
+        .color-dot:hover, .color-dot.sel { transform: scale(1.3); border-color: rgba(255,255,255,.7); }
 
-        .sidebar-hidden { display: none; }
-        @media (min-width: 769px) { .sidebar-hidden { display: flex !important; } }
-        @media (max-width: 768px) {
-            aside { position: fixed; top: 0; left: 0; height: 100vh; z-index: 40; transition: transform 0.3s; width: 280px !important; }
-            aside.sidebar-hidden { transform: translateX(-100%); }
-        }
+        /* Dropdown menu */
+        .cat-menu { position: absolute; right: 0; top: 26px; display: none; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.15); z-index: 100; min-width: 140px; }
+        .cat-menu-wrap:hover .cat-menu { display: block; }
+        .cat-menu-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: background .1s; }
+        .cat-menu-item:hover { background: var(--hover); }
 
-        /* Vue Transitions */
-        .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
-        .fade-enter-from, .fade-leave-to { opacity: 0; }
-        
-        .modal-enter-active, .modal-leave-active { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .modal-enter-from, .modal-leave-to { opacity: 0; transform: scale(0.95) translateY(10px); }
+        /* ── Bookmarks ── */
+        .bm-body { padding: 4px; min-height: 40px; background: var(--panel); }
+        .bm-empty { text-align: center; padding: 14px 8px; font-size: 11px; color: var(--muted); border: 1px dashed var(--border); border-radius: 5px; margin: 4px; background: var(--hover); }
+        .divider-row { display: flex; align-items: center; padding: 6px 4px 4px; cursor: move; position: relative; }
+        .divider-row .d-line { flex: 1; height: 1px; background: var(--border); }
+        .divider-row .d-label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--muted); padding: 0 6px; flex-shrink: 0; }
+        .divider-row .d-actions { display: none; position: absolute; right: 4px; gap: 2px; }
+        .divider-row:hover .d-actions { display: flex; }
+        .bm-item { display: flex; align-items: center; padding: 5px 8px; border-radius: 5px; cursor: pointer; position: relative; transition: background .1s; }
+        .bm-item:hover { background: var(--hover); }
+        .bm-item .bm-title { font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; transition: color .1s; }
+        .bm-item:hover .bm-title { color: #4f8ef7; }
+        .bm-item .bm-note { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bm-item .bm-edit { display: none; position: absolute; right: 4px; background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 1px; gap: 1px; }
+        .bm-item:hover .bm-edit { display: flex; }
+        .bm-edit-btn { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; color: var(--muted); cursor: pointer; border-radius: 3px; font-size: 9px; }
+        .bm-edit-btn:hover { color: #4f8ef7; background: var(--hover); }
+        /* card mode */
+        .card-mode .bm-item { width: calc(50% - 3px); flex-direction: column; align-items: flex-start; padding: 8px; border: 1px solid var(--border); background: var(--hover); }
+        .card-mode .bm-item:hover { background: var(--panel); border-color: #4f8ef7; }
+        .card-mode .bm-item .bm-edit { top: 4px; }
 
-        .toast-enter-active, .toast-leave-active { transition: all 0.3s ease; }
+        /* ── Add bookmark btn ── */
+        .add-bm-btn { width: 100%; padding: 5px; border: 2px dashed var(--border); border-radius: 5px; background: none; color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: all .15s; margin-top: 4px; }
+        .add-bm-btn:hover { border-color: #4f8ef7; color: #4f8ef7; }
+
+        /* ── Resize handle ── */
+        .resize-handle { cursor: col-resize; width: 14px; position: absolute; right: -7px; top: 0; bottom: 0; z-index: 20; }
+        .resize-handle:hover { background: rgba(79,142,247,.2); }
+
+        /* ── Drag states ── */
+        .sortable-ghost { opacity: 0.4; border: 2px dashed #4f8ef7 !important; }
+        .sortable-chosen { box-shadow: 0 4px 16px rgba(0,0,0,.15) !important; }
+        .drag-over-col { background: rgba(79,142,247,.15) !important; }
+        .merge-target { border-color: #10b981 !important; box-shadow: 0 0 0 2px rgba(16,185,129,.25) !important; }
+
+        /* ── Modals ── */
+        .overlay { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.45); backdrop-filter: blur(2px); }
+        .modal-box { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+        .modal-input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--hover); color: var(--text); font-size: 13px; outline: none; transition: border-color .2s; }
+        .modal-input:focus { border-color: #4f8ef7; }
+        .modal-label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+        .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all .15s; }
+        .btn-ghost { background: var(--hover); color: var(--muted); border: 1px solid var(--border); }
+        .btn-ghost:hover { color: var(--text); }
+        .btn-primary { background: #2563eb; color: #fff; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+        .btn-gray { background: #4b5563; color: #fff; }
+        .btn-gray:hover { background: #374151; }
+        .btn-gray:disabled { opacity: .45; cursor: not-allowed; }
+
+        /* ── Search overlay ── */
+        .search-result:hover { background: var(--hover); }
+        mark.search-highlight { background: rgba(250,204,21,.4); color: inherit; border-radius: 2px; padding: 0 2px; }
+
+        /* ── Toast ── */
+        .toast-enter-active, .toast-leave-active { transition: all .3s ease; }
         .toast-enter-from { opacity: 0; transform: translateX(30px); }
         .toast-leave-to { opacity: 0; transform: translateX(30px); }
+        .fade-enter-active, .fade-leave-active { transition: opacity .2s; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; }
+        .modal-enter-active, .modal-leave-active { transition: all .25s cubic-bezier(.4,0,.2,1); }
+        .modal-enter-from, .modal-leave-to { opacity: 0; transform: scale(.96) translateY(8px); }
 
-        /* Dynamic Theme Colors - simplified via CSS variables where possible, but keeping tailwind theme classes for compatibility */
-        .theme-blue { --theme-color: #2563eb; --theme-light: #eff6ff; --theme-hover: #1d4ed8; }
-        .theme-green { --theme-color: #16a34a; --theme-light: #f0fdf4; --theme-hover: #15803d; }
-        .theme-purple { --theme-color: #9333ea; --theme-light: #faf5ff; --theme-hover: #7c3aed; }
-        .theme-red { --theme-color: #dc2626; --theme-light: #fef2f2; --theme-hover: #b91c1c; }
-        .theme-gray { --theme-color: #4b5563; --theme-light: #f9fafb; --theme-hover: #374151; }
-        
-        .dark .theme-blue, .dark .theme-green, .dark .theme-purple, .dark .theme-red, .dark .theme-gray {
-            --theme-light: rgba(255,255,255,0.05);
-        }
+        /* ── Scrollbar ── */
+        .no-scroll::-webkit-scrollbar { display: none; }
+        .no-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .glass-header {
-            background-color: var(--glass-bg);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-        
-        /* Highlight match */
-        mark.search-highlight {
-            background-color: rgba(250, 204, 21, 0.4);
-            color: inherit;
-            border-radius: 2px;
-            padding: 0 2px;
+        @media (max-width: 768px) {
+            .nav-logo span { display: none; }
         }
     </style>
 </head>
 
-<body id="app" class="h-screen w-screen overflow-hidden bg-gray-100 dark:bg-dark-bg">
+<body id="app" class="h-screen w-screen overflow-hidden flex flex-col" :class="isDark ? 'dark' : ''" style="background:var(--bg)">
 
-    <div class="flex h-full w-full bg-gray-100/80 backdrop-blur-sm" :class="`theme-${themeColor}`">
-
-        <!-- 左侧 -->
-        <aside class="flex flex-col flex-shrink-0 h-full bg-white border-r border-gray-300 z-30 shadow-lg"
-            :class="{ 'sidebar-hidden': !sidebarOpen }" style="min-width: max-content;">
-            <div class="py-4 flex flex-col items-center justify-center px-2 border-b border-gray-200 dark:border-dark-border shrink-0 bg-gray-50 dark:bg-dark-panel">
-                <div class="flex items-center justify-center font-bold text-gray-800 mb-2">
-                    <img src="image/icon.jpeg" class="w-16 h-16 rounded-xl shadow-sm" alt="Custom Icon">
-                </div>
-                <div class="h-5 flex items-center justify-center text-[10px] sm:text-xs w-full">
-                    <transition name="fade" mode="out-in">
-                        <div v-if="syncStatus.show" :key="syncStatus.state" class="flex gap-1 items-center font-medium" :class="{
-                            'text-blue-500': syncStatus.state === 'saving',
-                            'text-green-500': syncStatus.state === 'saved',
-                            'text-red-500': syncStatus.state === 'error'
-                        }">
-                            <i v-if="syncStatus.state === 'saving'" class="fas fa-sync fa-spin"></i>
-                            <i v-if="syncStatus.state === 'saved'" class="fas fa-check"></i>
-                            <i v-if="syncStatus.state === 'error'" class="fas fa-exclamation-triangle"></i>
-                            <span>{{ syncStatus.state === 'saving' ? 'Syncing...' : (syncStatus.state === 'saved' ? 'Synced' : 'Sync Failed') }}</span>
-                        </div>
-                        <div v-else-if="user" key="user" class="text-gray-500 dark:text-dark-muted flex items-center justify-center truncate w-full px-2">
-                            <img :src="user.photoURL" class="w-4 h-4 rounded-full mr-1 shrink-0"> <span class="truncate">{{ user.displayName }}</span>
-                        </div>
-                    </transition>
-                </div>
-            </div>
-
-            <div class="flex-1 overflow-y-auto no-scrollbar py-2 space-y-1 px-2">
-                <div v-for="board in boards" :key="board.id" @click="switchBoard(board.id)"
-                    @dragover.prevent="onDragOverCollection(board.id)" @dragleave="onDragLeaveCollection(board.id)"
-                    @drop="onDropToCollection(board.id)"
-                    class="group flex items-center justify-between px-3 py-2.5 rounded border cursor-pointer transition-colors whitespace-nowrap relative"
-                    :class="[activeBoardId === board.id ? 'bg-blue-50 text-blue-800 border-blue-300 font-bold' : 'bg-white border-transparent hover:bg-gray-100 text-gray-700', dragTargetBoardId === board.id ? 'drag-over-collection' : '']">
-                    <div class="flex items-center">
-                        <div class="w-6 text-center shrink-0 flex items-center justify-center"><i :class="board.icon || 'fas fa-bookmark'"
-                                class="text-base"></i></div>
-                        <span class="ml-2 text-sm select-none">{{ board.title }}</span>
-                    </div>
-                    <i v-if="boards.length > 1" @click.stop="deleteBoard(board.id)"
-                        class="fas fa-times text-xs opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-600"></i>
-                </div>
-            </div>
-
-            <div class="p-3 border-t border-gray-300 shrink-0 bg-gray-50 dark:bg-dark-panel dark:border-dark-border">
-                <div class="space-y-2 mb-3">
-                    <button @click="openCreateBoardModal"
-                        class="flex items-center w-full py-2 px-3 bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded shadow-sm hover:border-blue-500 hover:text-blue-700 dark:hover:border-blue-500 dark:hover:text-blue-400 text-gray-700 dark:text-gray-300 font-bold text-xs transition-colors"><i
-                            class="fas fa-folder-plus w-5 text-center"></i><span>New Collection</span></button>
-                    <div v-if="activeBoard" class="flex gap-2">
-                        <button @click="createColumn" class="flex-1 flex items-center justify-center py-1.5 px-2 bg-gray-100 dark:bg-dark-border border border-gray-300 dark:border-gray-700 rounded hover:bg-white dark:hover:bg-dark-bg hover:border-blue-500 dark:hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-400 text-gray-600 dark:text-gray-400 font-bold text-[10px] transition-colors" title="Add Column"><i class="fas fa-columns mr-1"></i> Column</button>
-                        <button @click="createCategory()" class="flex-1 flex items-center justify-center py-1.5 px-2 bg-gray-100 dark:bg-dark-border border border-gray-300 dark:border-gray-700 rounded hover:bg-white dark:hover:bg-dark-bg hover:border-blue-500 dark:hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-400 text-gray-600 dark:text-gray-400 font-bold text-[10px] transition-colors" title="Add Category (to first column)"><i class="fas fa-list-alt mr-1"></i> Category</button>
-                    </div>
-                </div>
-                <div v-if="!user" class="flex items-center text-xs text-gray-400 cursor-pointer hover:text-blue-600 mb-2" @click="login">
-                    <i class="fas fa-sign-in-alt mr-1 w-4 text-center"></i> Not Logged In (Local Only)
-                </div>
-                <div class="flex items-center text-xs text-gray-500 font-medium cursor-pointer hover:text-blue-600"
-                    @click.stop="showSettings = true"><i class="fas fa-cog mr-1.5 w-4 text-center"></i> <span>Settings / Backup</span></div>
-            </div>
-        </aside>
-
-        <!-- 主内容 -->
-        <main class="flex-1 flex flex-col h-full overflow-hidden relative min-w-0">
-            <header
-                class="h-12 flex items-center justify-between px-6 z-10 shrink-0 bg-white border-b border-gray-300 shadow-sm glass-header transition-colors dark:bg-dark-panel dark:border-dark-border">
-                <div class="flex items-center gap-3 group">
-                    <button @click="sidebarOpen = !sidebarOpen" class="hidden sm:block md:hidden mr-2 p-1 rounded hover:bg-gray-100 dark:hover:bg-dark-border transition-colors">
-                        <i class="fas fa-bars text-gray-600 dark:text-dark-muted"></i>
-                    </button>
-                    <input v-if="activeBoard" v-model="activeBoard.title" @change="saveData"
-                        class="text-lg font-black bg-transparent border-b-2 border-transparent focus:border-blue-600 focus:outline-none w-64 text-gray-900 dark:text-dark-text placeholder-gray-400 hover:border-gray-300 dark:hover:border-dark-border transition-colors">
-                </div>
-                <div class="flex items-center gap-4 group">
-                    <button @click="searchOverlayOpen = true" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-300 dark:border-dark-border bg-gray-50 dark:bg-dark-bg text-sm text-gray-500 dark:text-dark-muted hover:bg-gray-100 dark:hover:bg-dark-border transition-colors cursor-text">
-                        <i class="fas fa-search text-xs"></i>
-                        <span class="w-16 text-left">Search...</span>
-                        <kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-gray-200 dark:bg-dark-border rounded border border-gray-300 dark:border-gray-700">Cmd+K</kbd>
-                    </button>
-                    <div class="flex items-center gap-2 border-l border-gray-300 dark:border-dark-border pl-4">
-                        <button @click="viewMode = viewMode === 'card' ? 'list' : 'card'" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-dark-border text-gray-500 dark:text-dark-muted transition-colors" title="Toggle View">
-                            <i class="fas" :class="viewMode === 'card' ? 'fa-list' : 'fa-th-large'"></i>
-                        </button>
-                        <button @click="isDark = !isDark" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-dark-border text-gray-500 dark:text-dark-muted transition-colors" title="Toggle Dark Mode">
-                            <i class="fas" :class="isDark ? 'fa-sun' : 'fa-moon'"></i>
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <div class="flex-1 overflow-x-auto overflow-y-hidden p-4" ref="boardContainer">
-                <div v-if="activeBoard && activeBoard.columns.length > 0" class="flex h-full gap-4 items-start pb-4"
-                    id="columns-container">
-                    <div v-for="(column, colIndex) in activeBoard.columns" :key="column.id"
-                        :style="{ width: column.width + 'px' }"
-                        class="column-wrapper flex-shrink-0 flex flex-col max-h-full relative group/column rounded-lg transition-all"
-                        :data-col-id="column.id">
-                        <div
-                            class="flex justify-between items-center mb-2 px-1 column-drag-handle opacity-0 group-hover/column:opacity-100 transition-opacity">
-                            <span
-                                class="text-xs font-bold text-gray-500 capitalize cursor-grab active:cursor-grabbing"><i
-                                    class="fas fa-grip-vertical mr-1"></i> Column</span>
-                            <i @click="deleteColumn(column.id)"
-                                class="fas fa-times hover:text-red-600 cursor-pointer text-xs text-gray-400 font-bold"></i>
-                        </div>
-                        <div class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-3 category-sortable-area min-h-[50px] pb-10"
-                            :data-col-id="column.id">
-                            <div v-for="category in filterCategories(column.categories)" :key="category.id"
-                                class="category-card flex flex-col rounded-lg card-panel overflow-hidden shrink-0"
-                                :data-cat-id="category.id" @dragover.prevent="onMergeDragOver(category.id)"
-                                @dragleave="onMergeDragLeave(category.id)" @drop="onMergeDrop(category.id)"
-                                :class="{ 'bg-green-50 border-green-400': mergeTargetCatId === category.id }">
-                                <div
-                                    class="px-2 py-1.5 flex justify-between items-center border-b border-gray-300 group bg-gray-100">
-                                    <div class="flex items-center flex-1 overflow-hidden">
-                                        <div class="mr-2 cursor-move text-gray-400 hover:text-blue-600 category-drag-handle"><i
-                                                class="fas fa-arrows-alt text-xs"></i></div>
-                                        <input v-model="category.title" @change="saveData"
-                                            class="bg-transparent font-bold text-sm text-gray-900 focus:outline-none w-full cursor-text hover:text-blue-700">
-                                    </div>
-                                    <div class="flex items-center shrink-0 gap-1">
-                                        <i @click.stop="deleteCategory(column.id, category.id)"
-                                            class="fas fa-trash-alt text-xs p-1.5 text-gray-400 hover:text-red-600 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                                        <div class="relative group/menu">
-                                            <i
-                                                class="fas fa-ellipsis-v text-xs p-1.5 text-gray-500 hover:text-black cursor-pointer"></i>
-                                            <div
-                                                class="absolute right-0 top-6 w-32 bg-white shadow-xl rounded border border-gray-300 hidden group-hover/menu:block z-50">
-
-                                                <div @click="addSubCategory(category.id)"
-                                                    class="px-3 py-2 hover:bg-blue-50 cursor-pointer text-xs text-gray-700">
-                                                    <i class="fas fa-minus w-4 text-gray-500"></i> Add Divider</div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="subcategory-list p-1 min-h-[40px] bg-white transition-colors dark:bg-dark-panel flex-1" :data-cat-id="category.id">
-                                    <div v-if="!category.subcategories || category.subcategories.length === 0" class="text-center py-4 text-xs text-gray-400 dark:text-dark-muted border border-dashed border-gray-200 dark:border-dark-border m-2 rounded bg-gray-50 dark:bg-dark-bg">
-                                        Drag & drop links here
-                                    </div>
-                                    <div v-for="sub in category.subcategories" :key="sub.id" class="subcategory-wrapper relative" :data-sub-id="sub.id">
-                                        <div v-if="sub.title !== null" class="subcat-drag-handle relative group/divider mt-2 mb-1 px-1 flex items-center cursor-move select-none">
-                                            <div class="h-px w-2 bg-gray-400 mr-2"></div><span class="text-xs font-black uppercase text-gray-500 flex-1 truncate">{{ sub.title }}</span><div class="h-px flex-1 bg-gray-400 ml-2"></div>
-                                            <i @click.stop="editSubcategory(category.id, sub)" class="fas fa-pen text-[9px] p-1 cursor-pointer text-gray-400 hover:text-blue-600 hidden group-hover/divider:block bg-white dark:bg-dark-bg absolute right-6"></i>
-                                            <i @click.stop="deleteSubcategory(category.id, sub.id)" class="fas fa-times text-[9px] p-1 cursor-pointer text-gray-400 hover:text-red-600 hidden group-hover/divider:block bg-white dark:bg-dark-bg absolute right-1"></i>
-                                        </div>
-                                        <div class="bookmark-list min-h-[10px]" :class="{'flex flex-wrap gap-2 content-start': viewMode === 'card'}" :data-cat-id="category.id" :data-sub-id="sub.id">
-                                            <template v-for="bookmark in sub.bookmarks" :key="bookmark.id">
-                                                <div :data-id="bookmark.id" class="bookmark-item relative group flex items-center px-2 py-1.5 mb-0 rounded hover:bg-blue-50 dark:hover:bg-dark-border cursor-pointer border border-transparent hover:border-blue-300 transition-colors" :class="viewMode === 'card' ? 'w-[calc(50%-0.25rem)] flex-col !items-start bg-gray-50 dark:bg-dark-bg !border-gray-200 dark:!border-dark-border' : ''">
-                                                    <div class="flex items-center w-full" :class="viewMode === 'card' ? 'mb-1' : ''">
-                                                        <img :src="bookmark.icon || getFavicon(bookmark.url)" class="w-4 h-4 mr-2 rounded-sm shrink-0" @error="handleImgError">
-                                                        <div class="flex-1 overflow-hidden" @click="openUrl(bookmark.url)">
-                                                            <div class="truncate compact-text font-medium text-gray-800 dark:text-gray-200 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{{ bookmark.title }}</div>
-                                                            <div v-if="bookmark.note && viewMode === 'list'" class="truncate compact-text text-gray-500 dark:text-dark-muted text-xs mt-0.5">{{ bookmark.note }}</div>
-                                                        </div>
-                                                    </div>
-                                                    <div v-if="bookmark.note && viewMode === 'card'" class="w-full text-xs text-gray-500 dark:text-dark-muted line-clamp-2 leading-relaxed">{{ bookmark.note }}</div>
-                                                    <div class="absolute right-1 flex opacity-0 group-hover:opacity-100 bg-white rounded shadow-sm border border-gray-300">
-                                                        <i @click.stop="editBookmark(category.id, sub.id, bookmark)" class="fas fa-pen text-[9px] p-1 cursor-pointer text-gray-500 hover:text-blue-600 border-r border-gray-200"></i><i @click.stop="deleteBookmark(category.id, sub.id, bookmark.id)" class="fas fa-times text-[9px] p-1 cursor-pointer text-gray-500 hover:text-red-600"></i>
-                                                    </div>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="px-2 pb-2">
-                                    <button @click="addBookmark(category.id)" title="Add a new bookmark to this category" aria-label="New Bookmark"
-                                        class="w-full py-1 border-2 border-dashed border-gray-300 rounded text-xs text-gray-400 hover:bg-white hover:text-blue-600 font-bold bg-white">+ New Bookmark</button>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="resize-handle" @mousedown="startResize($event, column)"></div>
-                    </div>
-
-                </div>
-            </div>
-        </main>
-
-        <!-- 全局搜索浮层 -->
-        <transition name="fade">
-            <div v-if="searchOverlayOpen" class="fixed inset-0 z-50 flex flex-col items-center pt-[10vh] bg-gray-900/40 dark:bg-black/60 backdrop-blur-[2px]" @click.self="searchOverlayOpen = false">
-                <div class="w-full max-w-2xl bg-white dark:bg-dark-panel rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[70vh] border border-gray-200 dark:border-dark-border">
-                    <div class="flex items-center px-4 py-3 border-b border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-bg">
-                        <i class="fas fa-search text-gray-400 dark:text-dark-muted text-lg mr-3"></i>
-                        <input type="text" v-model="searchQuery" id="searchInputOverlay" placeholder="Search across all collections..."
-                            class="flex-1 bg-transparent text-lg focus:outline-none text-gray-800 dark:text-gray-200 placeholder-gray-400" @keydown.esc="searchOverlayOpen = false">
-                        <button @click="searchOverlayOpen = false" class="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-dark-border text-gray-500 hover:bg-gray-300">ESC</button>
-                    </div>
-                    <div class="flex-1 overflow-y-auto p-2 no-scrollbar bg-white dark:bg-dark-panel">
-                        <div v-if="flatSearchResults.length === 0 && searchQuery" class="text-center py-10 text-gray-500 dark:text-dark-muted">
-                            No results found for "<span class="font-bold">{{ searchQuery }}</span>"
-                        </div>
-                        <div v-else-if="!searchQuery" class="text-center py-10 text-gray-400 dark:text-dark-muted text-sm flex flex-col items-center gap-2">
-                            <i class="fas fa-keyboard text-3xl mb-2 opacity-50"></i>
-                            Type to start searching globally...
-                        </div>
-                        <div v-for="(res, index) in flatSearchResults" :key="index"
-                            class="flex items-center px-4 py-3 hover:bg-blue-50 dark:hover:bg-dark-border cursor-pointer rounded-lg mb-1 group transition-colors"
-                            @click="openUrl(res.bookmark.url); searchOverlayOpen=false">
-                            <img :src="res.bookmark.icon || getFavicon(res.bookmark.url)" class="w-6 h-6 mr-3 rounded" @error="handleImgError">
-                            <div class="flex-1 min-w-0">
-                                <div class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate" v-html="highlightText(res.bookmark.title)"></div>
-                                <div class="text-[11px] text-gray-500 dark:text-dark-muted truncate mt-1 flex items-center gap-2">
-                                    <span class="bg-gray-100 dark:bg-dark-border px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-400 font-medium">
-                                        <i class="fas fa-folder-open text-[9px] mr-1"></i> {{ res.board }} <span class="mx-1 text-gray-300">&gt;</span> {{ res.category }}
-                                    </span>
-                                    <span class="truncate" v-if="res.bookmark.note">{{ res.bookmark.note }}</span>
-                                    <span class="truncate text-blue-500" v-else>{{ res.bookmark.url }}</span>
-                                </div>
-                            </div>
-                            <i class="fas fa-external-link-alt text-gray-300 dark:text-dark-border group-hover:text-blue-500 ml-2 hidden sm:block"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </transition>
-
-        <!-- Toasts 容器 -->
-        <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none">
-            <transition-group name="toast">
-                <div v-for="toast in toasts" :key="toast.id" 
-                    class="flex items-center px-4 py-3 rounded-lg shadow-xl text-sm max-w-sm pointer-events-auto transform transition-all"
-                    :class="toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800'">
-                    <i class="fas mr-3" :class="toast.type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle text-green-400 dark:text-green-600'"></i>
-                    <span class="flex-1 font-medium">{{ toast.message }}</span>
-                </div>
-            </transition-group>
+    <!-- ── Top Nav ── -->
+    <nav class="top-nav">
+        <div class="nav-logo">
+            <img src="image/icon.jpeg" class="w-7 h-7 rounded-md" alt="icon">
+            <span>LinkAnywhere</span>
         </div>
-
-        <!-- Confirm 对话框 -->
-        <transition name="modal">
-            <div v-if="confirmData.show" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-[2px]" @click.self="closeConfirm">
-                <div class="bg-white dark:bg-dark-panel rounded-xl shadow-2xl p-6 w-80 max-w-[90vw] border border-gray-200 dark:border-dark-border transform transition-all">
-                    <div class="flex items-center mb-4">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center mr-4 shrink-0"
-                            :class="confirmData.isDanger ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'">
-                            <i class="fas" :class="confirmData.isDanger ? 'fa-exclamation-triangle' : 'fa-question'"></i>
-                        </div>
-                        <h3 class="font-bold text-gray-900 dark:text-gray-100">{{ confirmData.isDanger ? 'Warning' : 'Confirm' }}</h3>
-                    </div>
-                    <p class="text-sm text-gray-600 dark:text-dark-muted mb-6 break-words">{{ confirmData.message }}</p>
-                    <div class="flex justify-end gap-3 flex-wrap">
-                        <button @click="closeConfirm" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-border rounded-lg transition-colors">Cancel</button>
-                        <button @click="executeConfirm" class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
-                            :class="confirmData.isDanger ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-600 hover:bg-blue-700'">Confirm</button>
-                    </div>
-                </div>
+        <div class="nav-tabs no-scroll">
+            <div v-for="board in boards" :key="board.id"
+                class="nav-tab" :class="{ active: activeBoardId === board.id }"
+                @click="switchBoard(board.id)"
+                @dragover.prevent="onDragOverCollection(board.id)"
+                @dragleave="onDragLeaveCollection(board.id)"
+                @drop="onDropToCollection(board.id)"
+                :style="dragTargetBoardId === board.id ? 'background:rgba(79,142,247,.2)' : ''">
+                <i :class="board.icon || 'fas fa-bookmark'" style="font-size:11px;opacity:.7"></i>
+                {{ board.title }}
+                <span v-if="boards.length > 1" class="x-btn" @click.stop="deleteBoard(board.id)">
+                    <i class="fas fa-times"></i>
+                </span>
             </div>
-        </transition>
+            <div class="nav-tab" style="opacity:.6" @click="openCreateBoardModal">
+                <i class="fas fa-plus" style="font-size:11px"></i> New
+            </div>
+        </div>
+        <div class="nav-sync">
+            <transition name="fade" mode="out-in">
+                <div v-if="syncStatus.show" :key="syncStatus.state" style="font-size:12px;font-weight:600"
+                    :style="syncStatus.state==='saving'?'color:#60a5fa':syncStatus.state==='saved'?'color:#34d399':'color:#f87171'">
+                    <i class="fas" :class="syncStatus.state==='saving'?'fa-sync fa-spin':syncStatus.state==='saved'?'fa-check':'fa-exclamation-triangle'"></i>
+                </div>
+                <div v-else-if="user" key="user" style="cursor:pointer" @click="showSettings=true" title="Account">
+                    <img :src="user.photoURL" style="width:26px;height:26px;border-radius:50%">
+                </div>
+                <div v-else key="nouser" @click="login" style="font-size:12px;color:#9aa0b0;cursor:pointer">
+                    <i class="fas fa-sign-in-alt"></i>
+                </div>
+            </transition>
+        </div>
+        <div class="nav-actions">
+            <button class="nav-btn" @click="searchOverlayOpen=true" title="Search (Cmd+K)"><i class="fas fa-search" style="font-size:12px"></i></button>
+            <button class="nav-btn" @click="viewMode=viewMode==='card'?'list':'card'" title="Toggle View"><i class="fas" :class="viewMode==='card'?'fa-list':'fa-th-large'" style="font-size:12px"></i></button>
+            <button class="nav-btn" @click="isDark=!isDark" title="Dark Mode"><i class="fas" :class="isDark?'fa-sun':'fa-moon'" style="font-size:12px"></i></button>
+            <button class="nav-btn" @click="showSettings=true" title="Settings"><i class="fas fa-cog" style="font-size:12px"></i></button>
+        </div>
+    </nav>
 
-
+    <!-- ── Subbar ── -->
+    <div v-if="activeBoard" class="subbar">
+        <input v-model="activeBoard.title" @change="saveData" placeholder="Collection name">
+        <div class="subbar-btns">
+            <button class="subbar-btn" @click="createColumn"><i class="fas fa-columns"></i> Column</button>
+            <button class="subbar-btn" @click="createCategory()"><i class="fas fa-list-alt"></i> Category</button>
+        </div>
     </div>
 
-    <!-- 业务模态框 -->
-    <transition name="modal">
-        <div v-if="modal.show" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
-            @click.self="modal.show = false">
-            <div class="bg-white dark:bg-dark-panel rounded-xl w-96 max-w-[90vw] shadow-2xl overflow-hidden border border-gray-200 dark:border-dark-border">
-                <div class="h-1.5 w-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
-                <div class="p-6">
-                    <div class="flex items-center mb-5">
-                        <div class="w-8 h-8 rounded-full bg-blue-50 dark:bg-dark-border flex items-center justify-center text-blue-600 dark:text-blue-400 mr-3">
-                            <i :class="getModalIcon()"></i>
+    <!-- ── Board ── -->
+    <div class="board-area" ref="boardContainer">
+        <div v-if="activeBoard && activeBoard.columns.length > 0" class="columns-wrap" id="columns-container">
+            <div v-for="(column, colIndex) in activeBoard.columns" :key="column.id"
+                :style="{ width: column.width + 'px' }"
+                class="column-wrapper" :data-col-id="column.id">
+
+                <div class="col-handle column-drag-handle">
+                    <span style="font-size:11px;font-weight:700;color:var(--muted);cursor:grab">
+                        <i class="fas fa-grip-vertical" style="margin-right:4px"></i>Column
+                    </span>
+                    <i class="fas fa-times" style="font-size:11px;color:var(--muted);cursor:pointer" @click="deleteColumn(column.id)" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color=''"></i>
+                </div>
+
+                <div class="no-scroll flex flex-col gap-3 category-sortable-area" style="flex:1;overflow-y:auto;min-height:50px;padding-bottom:40px" :data-col-id="column.id">
+                    <div v-for="category in filterCategories(column.categories)" :key="category.id"
+                        class="cat-card" :class="{ 'merge-target': mergeTargetCatId === category.id }"
+                        :data-cat-id="category.id"
+                        @dragover.prevent="onMergeDragOver(category.id)"
+                        @dragleave="onMergeDragLeave(category.id)"
+                        @drop="onMergeDrop(category.id)">
+
+                        <!-- Category header -->
+                        <div class="cat-head" :class="'cc-' + (category.color || 'blue')">
+                            <div style="display:flex;align-items:center;gap:6px;flex:1;overflow:hidden">
+                                <i class="fas fa-grip-vertical category-drag-handle" style="font-size:10px;color:rgba(255,255,255,.5);cursor:move;flex-shrink:0"></i>
+                                <input v-model="category.title" @change="saveData" placeholder="CATEGORY">
+                            </div>
+                            <div class="cat-head-actions">
+                                <!-- Color picker -->
+                                <div style="position:relative" class="color-picker-wrap">
+                                    <button class="cat-head-btn" title="Color"><i class="fas fa-palette" style="font-size:9px"></i></button>
+                                    <div class="color-picker">
+                                        <div v-for="c in ['blue','indigo','purple','pink','red','orange','yellow','green','teal','gray']" :key="c"
+                                            class="color-dot" :class="['cc-'+c, (category.color||'blue')===c?'sel':'']"
+                                            @click.stop="category.color=c;saveData()"></div>
+                                    </div>
+                                </div>
+                                <button class="cat-head-btn" @click.stop="deleteCategory(column.id, category.id)" title="Delete"><i class="fas fa-trash-alt" style="font-size:9px"></i></button>
+                                <!-- Menu -->
+                                <div style="position:relative" class="cat-menu-wrap">
+                                    <button class="cat-head-btn always" title="More"><i class="fas fa-ellipsis-v" style="font-size:9px"></i></button>
+                                    <div class="cat-menu">
+                                        <div class="cat-menu-item" @click="addSubCategory(category.id)">
+                                            <i class="fas fa-minus" style="color:var(--muted);width:12px"></i> Add Divider
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-lg text-gray-900 dark:text-gray-100">{{ modalTitle }}</h3>
+
+                        <!-- Bookmark body -->
+                        <div class="bm-body subcategory-list" :data-cat-id="category.id">
+                            <div v-if="!category.subcategories || category.subcategories.length === 0" class="bm-empty">
+                                Drag &amp; drop links here
+                            </div>
+                            <div v-for="sub in category.subcategories" :key="sub.id" class="subcategory-wrapper" :data-sub-id="sub.id">
+                                <!-- Divider -->
+                                <div v-if="sub.title !== null" class="divider-row subcat-drag-handle">
+                                    <div class="d-line"></div>
+                                    <span class="d-label">{{ sub.title }}</span>
+                                    <div class="d-line"></div>
+                                    <div class="d-actions">
+                                        <span class="bm-edit-btn" @click.stop="editSubcategory(category.id, sub)"><i class="fas fa-pen"></i></span>
+                                        <span class="bm-edit-btn" @click.stop="deleteSubcategory(category.id, sub.id)" style="color:#ef4444"><i class="fas fa-times"></i></span>
+                                    </div>
+                                </div>
+                                <!-- Bookmarks -->
+                                <div class="bookmark-list" :class="viewMode==='card'?'card-mode flex flex-wrap gap-1 p-1':''" :data-cat-id="category.id" :data-sub-id="sub.id" style="min-height:10px">
+                                    <template v-for="bookmark in sub.bookmarks" :key="bookmark.id">
+                                        <div :data-id="bookmark.id" class="bm-item" :class="viewMode==='card'?'w-[calc(50%-2px)] flex-col !items-start':''">
+                                            <div style="display:flex;align-items:center;width:100%">
+                                                <img :src="bookmark.icon || getFavicon(bookmark.url)" style="width:14px;height:14px;margin-right:7px;border-radius:3px;flex-shrink:0" @error="handleImgError">
+                                                <div style="flex:1;overflow:hidden" @click="openUrl(bookmark.url)">
+                                                    <div class="bm-title">{{ bookmark.title }}</div>
+                                                    <div v-if="bookmark.note && viewMode==='list'" class="bm-note">{{ bookmark.note }}</div>
+                                                </div>
+                                            </div>
+                                            <div v-if="bookmark.note && viewMode==='card'" class="bm-note" style="width:100%;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ bookmark.note }}</div>
+                                            <div class="bm-edit">
+                                                <span class="bm-edit-btn" @click.stop="editBookmark(category.id, sub.id, bookmark)"><i class="fas fa-pen"></i></span>
+                                                <span class="bm-edit-btn" @click.stop="deleteBookmark(category.id, sub.id, bookmark.id)" style="color:#ef4444"><i class="fas fa-times"></i></span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add bookmark -->
+                        <div style="padding:4px 6px 6px;background:var(--panel)">
+                            <button class="add-bm-btn" @click="addBookmark(category.id)">+ New Bookmark</button>
+                        </div>
                     </div>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Name <span class="text-red-500">*</span></label>
-                            <input v-model="modal.data.title" @keyup.enter="handleEnterKey" ref="modalInput"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Enter name">
-                        </div>
-                        
-                        <div v-if="!modal.isBoard && !modal.isDivider">
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">URL <span class="text-red-500">*</span></label>
-                            <input v-model="modal.data.url" @keyup.enter="saveModal"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="https://example.com">
-                        </div>
-                        
-                        <div v-if="modal.isBoard">
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Icon Class (FontAwesome)</label>
-                            <input v-model="modal.data.icon" @keyup.enter="saveModal"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="fas fa-bookmark">
-                        </div>
-                        
-                        <div v-if="!modal.isBoard && !modal.isDivider">
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Notes</label>
-                            <textarea v-model="modal.data.note" rows="2"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Optional notes"></textarea>
-                        </div>
-                        <div v-if="!modal.isBoard && !modal.isDivider">
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Custom Icon URL</label>
-                            <input v-model="modal.data.icon" @keyup.enter="saveModal"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Optional custom icon url">
-                        </div>
+                </div>
+                <div class="resize-handle" @mousedown="startResize($event, column)"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Search Overlay ── -->
+    <transition name="fade">
+        <div v-if="searchOverlayOpen" class="overlay" @click.self="searchOverlayOpen=false">
+            <div class="modal-box" style="width:100%;max-width:640px;max-height:70vh;display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--hover);border-radius:12px 12px 0 0">
+                    <i class="fas fa-search" style="color:var(--muted);font-size:16px;margin-right:12px"></i>
+                    <input type="text" v-model="searchQuery" id="searchInputOverlay" placeholder="Search across all collections..."
+                        style="flex:1;background:transparent;border:none;outline:none;font-size:15px;color:var(--text)"
+                        @keydown.esc="searchOverlayOpen=false">
+                    <button @click="searchOverlayOpen=false" class="btn btn-ghost" style="padding:3px 8px;font-size:11px">ESC</button>
+                </div>
+                <div class="no-scroll" style="flex:1;overflow-y:auto;padding:8px">
+                    <div v-if="flatSearchResults.length===0 && searchQuery" style="text-align:center;padding:40px;color:var(--muted);font-size:13px">
+                        No results for "<strong>{{ searchQuery }}</strong>"
                     </div>
-                    
-                    <div class="flex justify-end gap-3 mt-6">
-                        <button @click="modal.show=false"
-                            class="px-4 py-2 font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-dark-border hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors">Cancel</button>
-                        <button v-if="!modal.isBoard && !modal.isDivider" @click="analyzeUrl" :disabled="!modal.data.url || analyzingUrl"
-                            class="px-4 py-2 font-medium bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5">
-                            <i class="fas" :class="analyzingUrl ? 'fa-spinner fa-spin' : 'fa-magic'"></i>
-                            {{ analyzingUrl ? 'Analyzing...' : 'Analyze' }}
-                        </button>
-                        <button @click="saveModal" :disabled="!modal.data.title || (!modal.isBoard && !modal.isDivider && !modal.data.url)"
-                            class="px-4 py-2 font-medium bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">Save</button>
+                    <div v-else-if="!searchQuery" style="text-align:center;padding:40px;color:var(--muted);font-size:13px">
+                        <i class="fas fa-keyboard" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4"></i>
+                        Type to search globally...
+                    </div>
+                    <div v-for="(res, index) in flatSearchResults" :key="index"
+                        class="search-result" style="display:flex;align-items:center;padding:10px 12px;border-radius:7px;cursor:pointer;margin-bottom:2px"
+                        @click="openUrl(res.bookmark.url); searchOverlayOpen=false">
+                        <img :src="res.bookmark.icon || getFavicon(res.bookmark.url)" style="width:22px;height:22px;border-radius:4px;margin-right:12px" @error="handleImgError">
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" v-html="highlightText(res.bookmark.title)"></div>
+                            <div style="font-size:11px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:6px">
+                                <span style="background:var(--hover);padding:1px 6px;border-radius:3px">{{ res.board }} › {{ res.category }}</span>
+                                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ res.bookmark.note || res.bookmark.url }}</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-external-link-alt" style="color:var(--muted);font-size:11px;margin-left:8px"></i>
                     </div>
                 </div>
             </div>
         </div>
     </transition>
 
-    <!-- 设置窗口 (完整版) -->
-    <transition name="fade">
-        <div v-if="showSettings" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
-            @click.self="showSettings = false">
-            <div class="bg-white dark:bg-dark-panel rounded-xl w-[450px] max-w-[90vw] shadow-2xl p-6 overflow-y-auto max-h-[85vh] border border-gray-200 dark:border-dark-border transform transition-all">
-                <div class="flex justify-between items-center mb-5 border-b border-gray-100 dark:border-dark-border pb-3">
-                    <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100">Settings</h3>
-                    <button class="w-8 h-8 rounded-full bg-gray-100 dark:bg-dark-border flex items-center justify-center text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors" @click="showSettings = false"><i class="fas fa-times"></i></button>
-                </div>
-                
-                <!-- 1. Cloud Sync -->
-                <div class="mb-6">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Cloud Sync</label>
-                    <div v-if="!user" class="text-center bg-gray-50 dark:bg-dark-bg p-4 rounded-lg border border-gray-200 dark:border-dark-border">
-                        <i class="fas fa-cloud text-gray-400 text-2xl mb-2"></i>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Sign in to sync across devices automatically</p>
-                        <button @click="login"
-                            class="w-full py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 flex items-center justify-center gap-2 font-medium transition-colors"><i
-                                class="fab fa-google"></i> Sign In with Google</button>
-                    </div>
-                    <div v-else class="text-center bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800/50">
-                        <div class="w-12 h-12 mx-auto rounded-full overflow-hidden mb-2 border-2 border-green-200">
-                            <img :src="user.photoURL" class="w-full h-full object-cover">
-                        </div>
-                        <p class="text-sm text-green-700 dark:text-green-400 font-bold mb-3">{{ user.email }}</p>
-                        <button @click="logout"
-                            class="px-4 py-1.5 bg-white dark:bg-dark-panel text-red-500 border border-red-200 dark:border-red-900/50 rounded text-xs hover:bg-red-50 dark:hover:bg-red-900/20 font-medium transition-colors">Sign Out</button>
-                    </div>
-                </div>
+    <!-- ── Toasts ── -->
+    <div style="position:fixed;bottom:24px;right:24px;z-index:60;display:flex;flex-direction:column;gap:10px;pointer-events:none">
+        <transition-group name="toast">
+            <div v-for="toast in toasts" :key="toast.id"
+                style="display:flex;align-items:center;padding:12px 16px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.2);font-size:13px;font-weight:500;pointer-events:auto;max-width:320px"
+                :style="toast.type==='error'?'background:#ef4444;color:#fff':'background:#1e2433;color:#e2e5ea'">
+                <i class="fas" :class="toast.type==='error'?'fa-exclamation-circle':'fa-check-circle'" style="margin-right:10px" :style="toast.type==='error'?'':'color:#34d399'"></i>
+                {{ toast.message }}
+            </div>
+        </transition-group>
+    </div>
 
-                <!-- 2. Data Backup & Migration -->
-                <div class="mb-6 pt-5 border-t border-gray-100 dark:border-dark-border">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Data Management</label>
-                    <div class="flex gap-3">
-                        <button @click="exportHtml"
-                            class="flex-1 py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-dark-border hover:bg-gray-200 dark:hover:bg-gray-700 font-medium flex items-center justify-center transition-colors">
-                            <i class="fas fa-download mr-2 text-blue-500"></i> Export HTML
+    <!-- ── Confirm Dialog ── -->
+    <transition name="modal">
+        <div v-if="confirmData.show" class="overlay" style="z-index:70" @click.self="closeConfirm">
+            <div class="modal-box" style="width:320px;max-width:90vw;padding:24px">
+                <div style="display:flex;align-items:center;margin-bottom:14px">
+                    <div style="width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:14px;flex-shrink:0"
+                        :style="confirmData.isDanger?'background:rgba(239,68,68,.12);color:#ef4444':'background:rgba(79,142,247,.12);color:#4f8ef7'">
+                        <i class="fas" :class="confirmData.isDanger?'fa-exclamation-triangle':'fa-question'"></i>
+                    </div>
+                    <strong style="color:var(--text)">{{ confirmData.isDanger ? 'Warning' : 'Confirm' }}</strong>
+                </div>
+                <p style="font-size:13px;color:var(--muted);margin-bottom:20px;word-break:break-word">{{ confirmData.message }}</p>
+                <div style="display:flex;justify-content:flex-end;gap:10px">
+                    <button class="btn btn-ghost" @click="closeConfirm">Cancel</button>
+                    <button class="btn" @click="executeConfirm" :class="confirmData.isDanger?'bg-red-500 text-white hover:bg-red-600':'btn-primary'">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </transition>
+
+    <!-- ── Bookmark / Board Modal ── -->
+    <transition name="modal">
+        <div v-if="modal.show" class="overlay" style="z-index:60" @click.self="modal.show=false">
+            <div class="modal-box" style="width:400px;max-width:92vw;overflow:hidden">
+                <div style="height:4px;background:linear-gradient(90deg,#2563eb,#7c3aed)"></div>
+                <div style="padding:24px">
+                    <div style="display:flex;align-items:center;margin-bottom:20px">
+                        <div style="width:32px;height:32px;border-radius:50%;background:rgba(79,142,247,.12);color:#4f8ef7;display:flex;align-items:center;justify-content:center;margin-right:12px;flex-shrink:0">
+                            <i :class="getModalIcon()"></i>
+                        </div>
+                        <h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0">{{ modalTitle }}</h3>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:14px">
+                        <div>
+                            <label class="modal-label">Name <span style="color:#ef4444">*</span></label>
+                            <input class="modal-input" v-model="modal.data.title" @keyup.enter="handleEnterKey" ref="modalInput" placeholder="Enter name">
+                        </div>
+                        <div v-if="!modal.isBoard && !modal.isDivider">
+                            <label class="modal-label">URL <span style="color:#ef4444">*</span></label>
+                            <input class="modal-input" v-model="modal.data.url" @keyup.enter="saveModal" placeholder="https://example.com">
+                        </div>
+                        <div v-if="modal.isBoard">
+                            <label class="modal-label">Icon (FontAwesome class)</label>
+                            <input class="modal-input" v-model="modal.data.icon" @keyup.enter="saveModal" placeholder="fas fa-bookmark">
+                        </div>
+                        <div v-if="!modal.isBoard && !modal.isDivider">
+                            <label class="modal-label">Notes</label>
+                            <textarea class="modal-input" v-model="modal.data.note" rows="2" placeholder="Optional notes" style="resize:none"></textarea>
+                        </div>
+                        <div v-if="!modal.isBoard && !modal.isDivider">
+                            <label class="modal-label">Custom Icon URL</label>
+                            <input class="modal-input" v-model="modal.data.icon" @keyup.enter="saveModal" placeholder="Optional icon URL">
+                        </div>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px">
+                        <button class="btn btn-ghost" @click="modal.show=false">Cancel</button>
+                        <button v-if="!modal.isBoard && !modal.isDivider" class="btn btn-gray" @click="analyzeUrl" :disabled="!modal.data.url || analyzingUrl">
+                            <i class="fas" :class="analyzingUrl?'fa-spinner fa-spin':'fa-magic'" style="margin-right:5px"></i>
+                            {{ analyzingUrl ? 'Analyzing...' : 'Analyze' }}
                         </button>
-                        <div class="flex-1 relative">
-                            <button
-                                class="w-full py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-dark-border hover:bg-gray-200 dark:hover:bg-gray-700 font-medium flex items-center justify-center transition-colors">
-                                <i class="fas fa-upload mr-2 text-green-500"></i> Import HTML
+                        <button class="btn btn-primary" @click="saveModal" :disabled="!modal.data.title || (!modal.isBoard && !modal.isDivider && !modal.data.url)">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </transition>
+
+    <!-- ── Settings Modal ── -->
+    <transition name="modal">
+        <div v-if="showSettings" class="overlay" style="z-index:60" @click.self="showSettings=false">
+            <div class="modal-box" style="width:440px;max-width:92vw;max-height:88vh;overflow-y:auto;padding:24px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+                    <h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0">Settings</h3>
+                    <button class="btn btn-ghost" style="padding:4px 10px" @click="showSettings=false"><i class="fas fa-times"></i></button>
+                </div>
+
+                <!-- Cloud Sync -->
+                <div style="margin-bottom:22px">
+                    <div class="modal-label" style="margin-bottom:10px">Cloud Sync</div>
+                    <div v-if="!user" style="text-align:center;padding:16px;border-radius:8px;border:1px solid var(--border);background:var(--hover)">
+                        <i class="fas fa-cloud" style="font-size:24px;color:var(--muted);display:block;margin-bottom:8px"></i>
+                        <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Sign in to sync across devices</p>
+                        <button class="btn btn-primary" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px" @click="login">
+                            <i class="fab fa-google"></i> Sign In with Google
+                        </button>
+                    </div>
+                    <div v-else style="text-align:center;padding:16px;border-radius:8px;border:1px solid #86efac;background:rgba(134,239,172,.08)">
+                        <img :src="user.photoURL" style="width:44px;height:44px;border-radius:50%;margin:0 auto 8px;display:block;border:2px solid #86efac">
+                        <p style="font-size:13px;font-weight:600;color:#16a34a;margin-bottom:10px">{{ user.email }}</p>
+                        <button class="btn" style="background:transparent;color:#ef4444;border:1px solid #fca5a5;font-size:12px" @click="logout">Sign Out</button>
+                    </div>
+                </div>
+
+                <!-- Data -->
+                <div style="margin-bottom:22px;padding-top:18px;border-top:1px solid var(--border)">
+                    <div class="modal-label" style="margin-bottom:10px">Data Management</div>
+                    <div style="display:flex;gap:10px">
+                        <button class="btn btn-ghost" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px" @click="exportHtml">
+                            <i class="fas fa-download" style="color:#60a5fa"></i> Export HTML
+                        </button>
+                        <div style="flex:1;position:relative">
+                            <button class="btn btn-ghost" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px">
+                                <i class="fas fa-upload" style="color:#34d399"></i> Import HTML
                             </button>
-                            <input type="file" @change="importHtml" class="absolute inset-0 opacity-0 cursor-pointer"
-                                accept=".html,.htm">
+                            <input type="file" @change="importHtml" style="position:absolute;inset:0;opacity:0;cursor:pointer" accept=".html,.htm">
                         </div>
                     </div>
-                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-2 text-center">* Supports Netscape Bookmark format</p>
+                    <p style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center">Supports Netscape Bookmark format</p>
                 </div>
 
-                <!-- 3. Appearance -->
-                <div class="mb-2 pt-5 border-t border-gray-100 dark:border-dark-border">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Appearance</label>
-                    <div class="mt-2">
-                        <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Theme Color</span>
-                        <select v-model="themeColor" @change="saveData" class="w-full p-2 border border-gray-300 dark:border-dark-border rounded mt-1.5 bg-white dark:bg-dark-bg text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:border-blue-500">
-                            <option value="blue">Blue</option>
-                            <option value="green">Green</option>
-                            <option value="purple">Purple</option>
-                            <option value="red">Red</option>
-                            <option value="gray">Gray</option>
-                        </select>
+                <!-- Appearance -->
+                <div style="margin-bottom:22px;padding-top:18px;border-top:1px solid var(--border)">
+                    <div class="modal-label" style="margin-bottom:10px">Appearance</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between">
+                        <span style="font-size:13px;color:var(--text)">Dark Mode</span>
+                        <button class="btn btn-ghost" style="padding:5px 12px;font-size:12px" @click="isDark=!isDark">
+                            <i class="fas" :class="isDark?'fa-sun':'fa-moon'" style="margin-right:5px"></i>
+                            {{ isDark ? 'Light' : 'Dark' }}
+                        </button>
                     </div>
                 </div>
 
-                <div class="pt-6 mt-4 border-t border-gray-100 dark:border-dark-border text-center">
-                    <button @click="resetData" class="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg transition-colors">
-                        <i class="fas fa-exclamation-triangle mr-1"></i> Reset All Data
+                <!-- Danger -->
+                <div style="padding-top:18px;border-top:1px solid var(--border);text-align:center">
+                    <button class="btn" style="background:rgba(239,68,68,.1);color:#ef4444;font-size:12px" @click="resetData">
+                        <i class="fas fa-exclamation-triangle" style="margin-right:5px"></i> Reset All Data
                     </button>
                 </div>
             </div>
