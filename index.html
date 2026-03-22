@@ -95,11 +95,7 @@
         .color-dot { width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform .1s; }
         .color-dot:hover, .color-dot.sel { transform: scale(1.3); border-color: rgba(255,255,255,.7); }
 
-        /* Dropdown menu */
-        .cat-menu { position: absolute; right: 0; top: 26px; display: none; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.15); z-index: 100; min-width: 140px; }
-        .cat-menu-wrap:hover .cat-menu { display: block; }
-        .cat-menu-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: background .1s; }
-        .cat-menu-item:hover { background: var(--hover); }
+
 
         /* ── Bookmarks ── */
         .bm-body { padding: 4px; min-height: 40px; background: var(--panel); }
@@ -273,16 +269,8 @@
                                             @click.stop="category.color=c;saveData()"></div>
                                     </div>
                                 </div>
+                                <button class="cat-head-btn" @click.stop="addSubCategory(category.id)" title="Add Subcategory"><i class="fas fa-layer-group" style="font-size:9px"></i></button>
                                 <button class="cat-head-btn" @click.stop="deleteCategory(column.id, category.id)" title="Delete"><i class="fas fa-trash-alt" style="font-size:9px"></i></button>
-                                <!-- Menu -->
-                                <div style="position:relative" class="cat-menu-wrap">
-                                    <button class="cat-head-btn always" title="More"><i class="fas fa-ellipsis-v" style="font-size:9px"></i></button>
-                                    <div class="cat-menu">
-                                        <div class="cat-menu-item" @click="addSubCategory(category.id)">
-                                            <i class="fas fa-minus" style="color:var(--muted);width:12px"></i> Add Divider
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
@@ -961,7 +949,7 @@
                 };
 
                 return {
-                    boards, activeBoardId, activeBoard, searchQuery, modal, showSettings, modalTitle: computed(() => { if (modal.value.isBoard) return modal.value.isEdit ? 'Edit Collection' : 'New Collection'; if (modal.value.isDivider) return 'Add Divider'; return modal.value.isEdit ? 'Edit' : 'Add'; }),
+                    boards, activeBoardId, activeBoard, searchQuery, modal, showSettings, modalTitle: computed(() => { if (modal.value.isBoard) return modal.value.isEdit ? 'Edit Collection' : 'New Collection'; if (modal.value.isDivider) return modal.value.isEdit ? 'Edit Subcategory' : 'Add Subcategory'; return modal.value.isEdit ? 'Edit' : 'Add'; }),
                     modalInput, user, syncStatus, isDark, toasts, showToast, confirmData, closeConfirm, executeConfirm, viewMode, searchOverlayOpen, flatSearchResults, highlightText,
                     saveData, openCreateBoardModal, openEditBoardModal, deleteBoardFromModal, deleteBoard, createColumn, deleteColumn, createCategory, deleteCategory, addBookmark, addSubCategory, editSubcategory, deleteSubcategory, editBookmark, deleteBookmark, saveModal, handleEnterKey, getModalIcon, getFavicon, handleImgError, openUrl, startResize, switchBoard, filterCategories, boardContainer: ref(null), resetData,
                     onDragOverCollection, onDragLeaveCollection, onDropToCollection, dragTargetBoardId, onMergeDragOver, onMergeDragLeave, onMergeDrop, mergeTargetCatId,
