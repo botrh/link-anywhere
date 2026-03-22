@@ -163,6 +163,11 @@
         .modal-enter-active, .modal-leave-active { transition: all .25s cubic-bezier(.4,0,.2,1); }
         .modal-enter-from, .modal-leave-to { opacity: 0; transform: scale(.96) translateY(8px); }
 
+        /* ── Nav icon tooltip ── */
+        .nav-action-icon-wrap { display: flex; align-items: center; }
+        .nav-icon-tooltip { position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #1e2433; color: #e2e5ea; font-size: 11px; font-weight: 500; white-space: nowrap; padding: 4px 8px; border-radius: 5px; pointer-events: none; opacity: 0; transition: opacity .15s; z-index: 200; border: 1px solid rgba(255,255,255,.1); }
+        .nav-action-icon-wrap:hover .nav-icon-tooltip { opacity: 1; }
+
         /* ── Scrollbar ── */
         .no-scroll::-webkit-scrollbar { display: none; }
         .no-scroll { -ms-overflow-style: none; scrollbar-width: none; }
@@ -179,7 +184,6 @@
     <nav class="top-nav">
         <div class="nav-logo">
             <img src="image/icon.jpeg" class="w-7 h-7 rounded-md" alt="icon">
-            <span>LinkAnywhere</span>
         </div>
         <div class="nav-tabs no-scroll">
             <div v-for="board in boards" :key="board.id"
@@ -199,38 +203,43 @@
                 <i class="fas fa-plus" style="font-size:11px"></i> New
             </div>
         </div>
-        <div class="nav-sync">
+        <!-- Group 1: Add Column / Add Category -->
+        <div v-if="activeBoard" class="nav-actions">
+            <div class="nav-action-icon-wrap" style="position:relative">
+                <button class="nav-btn" @click="createColumn" aria-label="Add Column"><i class="fas fa-columns" style="font-size:12px"></i></button>
+                <span class="nav-icon-tooltip">Add Column</span>
+            </div>
+            <div class="nav-action-icon-wrap" style="position:relative">
+                <button class="nav-btn" @click="createCategory()" aria-label="Add Category"><i class="fas fa-list-alt" style="font-size:12px"></i></button>
+                <span class="nav-icon-tooltip">Add Category</span>
+            </div>
+        </div>
+        <!-- Group 2: Search -->
+        <div class="nav-actions">
+            <button class="nav-btn" @click="searchOverlayOpen=true" title="Search (Cmd+K)"><i class="fas fa-search" style="font-size:12px"></i></button>
+        </div>
+        <!-- Group 3: View + Theme -->
+        <div class="nav-actions">
+            <button class="nav-btn" @click="viewMode=viewMode==='card'?'list':'card'" title="Toggle View"><i class="fas" :class="viewMode==='card'?'fa-list':'fa-th-large'" style="font-size:12px"></i></button>
+            <button class="nav-btn" @click="isDark=!isDark" title="Dark Mode"><i class="fas" :class="isDark?'fa-sun':'fa-moon'" style="font-size:12px"></i></button>
+        </div>
+        <!-- Group 4: Login + Settings -->
+        <div class="nav-actions">
             <transition name="fade" mode="out-in">
-                <div v-if="syncStatus.show" :key="syncStatus.state" style="font-size:12px;font-weight:600"
+                <div v-if="syncStatus.show" :key="syncStatus.state" style="font-size:12px;font-weight:600;padding:0 6px"
                     :style="syncStatus.state==='saving'?'color:#60a5fa':syncStatus.state==='saved'?'color:#34d399':'color:#f87171'">
                     <i class="fas" :class="syncStatus.state==='saving'?'fa-sync fa-spin':syncStatus.state==='saved'?'fa-check':'fa-exclamation-triangle'"></i>
                 </div>
-                <div v-else-if="user" key="user" style="cursor:pointer" @click="showSettings=true" title="Account">
+                <div v-else-if="user" key="user" style="cursor:pointer;padding:0 4px" @click="showSettings=true" title="Account">
                     <img :src="user.photoURL" style="width:26px;height:26px;border-radius:50%">
                 </div>
-                <div v-else key="nouser" @click="login" style="font-size:12px;color:#9aa0b0;cursor:pointer">
-                    <i class="fas fa-sign-in-alt"></i>
-                </div>
+                <button v-else key="nouser" class="nav-btn" @click="login" title="Sign In"><i class="fas fa-sign-in-alt" style="font-size:12px"></i></button>
             </transition>
-        </div>
-        <div class="nav-actions">
-            <button class="nav-btn" @click="searchOverlayOpen=true" title="Search (Cmd+K)"><i class="fas fa-search" style="font-size:12px"></i></button>
-            <button class="nav-btn" @click="viewMode=viewMode==='card'?'list':'card'" title="Toggle View"><i class="fas" :class="viewMode==='card'?'fa-list':'fa-th-large'" style="font-size:12px"></i></button>
-            <button class="nav-btn" @click="isDark=!isDark" title="Dark Mode"><i class="fas" :class="isDark?'fa-sun':'fa-moon'" style="font-size:12px"></i></button>
             <button class="nav-btn" @click="showSettings=true" title="Settings"><i class="fas fa-cog" style="font-size:12px"></i></button>
         </div>
     </nav>
 
-    <!-- ── Subbar ── -->
-    <div v-if="activeBoard" class="subbar">
-        <span style="font-size:13px;font-weight:700;color:var(--text)">
-            <i :class="activeBoard.icon || 'fas fa-bookmark'" style="margin-right:6px;opacity:.6"></i>{{ activeBoard.title }}
-        </span>
-        <div class="subbar-btns">
-            <button class="subbar-btn" @click="createColumn"><i class="fas fa-columns"></i> Column</button>
-            <button class="subbar-btn" @click="createCategory()"><i class="fas fa-list-alt"></i> Category</button>
-        </div>
-    </div>
+
 
     <!-- ── Board ── -->
     <div class="board-area" ref="boardContainer">
