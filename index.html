@@ -436,6 +436,11 @@
                     <div class="flex justify-end gap-3 mt-6">
                         <button @click="modal.show=false"
                             class="px-4 py-2 font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-dark-border hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors">Cancel</button>
+                        <button v-if="!modal.isBoard && !modal.isDivider" @click="analyzeUrl" :disabled="!modal.data.url || analyzingUrl"
+                            class="px-4 py-2 font-medium bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5">
+                            <i class="fas" :class="analyzingUrl ? 'fa-spinner fa-spin' : 'fa-magic'"></i>
+                            {{ analyzingUrl ? 'Analyzing...' : 'Analyze' }}
+                        </button>
                         <button @click="saveModal" :disabled="!modal.data.title || (!modal.isBoard && !modal.isDivider && !modal.data.url)"
                             class="px-4 py-2 font-medium bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">Save</button>
                     </div>
@@ -585,6 +590,7 @@
                 const mergeTargetCatId = ref(null);
                 const draggingCategoryInfo = ref(null);
                 const sidebarOpen = ref(true);
+                const analyzingUrl = ref(false);
 
                 const activeBoard = computed(() => activeBoardId.value ? (boards.value.find(b => b.id === activeBoardId.value) || null) : null);
                 const filterCategories = (categories) => {
@@ -863,6 +869,27 @@
                 const editBookmark = (catId, subId, bm) => { modal.value = { show: true, isEdit: true, isDivider: false, categoryId: catId, subId: subId, data: { ...bm, icon: bm.icon || '', note: bm.note || '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
                 const deleteBookmark = (catId, subId, bmId) => { for (const col of activeBoard.value.columns) { const cat = col.categories.find(c => c.id === catId); if (cat) { const sub = cat.subcategories.find(s => s.id === subId); if (sub) { sub.bookmarks = sub.bookmarks.filter(b => b.id !== bmId); break; } } } saveData(); };
                 const handleEnterKey = () => { if (modal.value.isBoard || modal.value.isDivider || modal.value.data.title) saveModal(); };
+                const analyzeUrl = async () => {
+                    const url = modal.value.data.url;
+                    if (!url) return;
+                    analyzingUrl.value = true;
+                    try {
+                        const res = await fetch(`https://website-title.dfbwy233.workers.dev/?url=${encodeURIComponent(url)}`);
+                        const json = await res.json();
+                        if (json.title) {
+                            modal.value.data.title = json.title;
+                            const u = new URL(url);
+                            if (!modal.value.data.icon) modal.value.data.icon = `https://www.google.com/s2/favicons?domain=${u.origin}&sz=64`;
+                            showToast('Title fetched');
+                        } else {
+                            showToast('Could not extract title', 'error');
+                        }
+                    } catch (e) {
+                        showToast('Failed to fetch', 'error');
+                    } finally {
+                        analyzingUrl.value = false;
+                    }
+                };
                 const saveModal = () => {
                     const { categoryId, subId, data, isEdit, isBoard, isDivider } = modal.value;
                     if (isBoard) { if (!data.title.trim()) return; const newBoard = { id: Date.now(), title: data.title, icon: 'fas fa-bookmark', columns: [{ id: 'c1', width: 280, categories: [] }] }; boards.value.push(newBoard); activeBoardId.value = newBoard.id; saveData(); }
