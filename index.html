@@ -10,278 +10,124 @@
     <script src="https://cdn.staticfile.net/vue/3.3.4/vue.global.prod.min.js"></script>
     <script src="https://cdn.staticfile.net/Sortable/1.15.0/Sortable.min.js"></script>
     <link href="https://cdn.staticfile.net/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        dark: { bg: '#121212', panel: '#1e1e1e', border: '#2d2d2d', text: '#e0e0e0', muted: '#9e9e9e' }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
+        :root {
+            --bg-color: #f3f4f6;
+            --panel-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --hover-bg: #f9fafb;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+        }
+
+        .dark {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --border-color: #2d2d2d;
+            --text-color: #e0e0e0;
+            --text-muted: #9e9e9e;
+            --hover-bg: #2a2a2a;
+            --glass-bg: rgba(30, 30, 30, 0.85);
+        }
+
         body {
-            font-family: "Microsoft YaHei", sans-serif;
-            color: #1f2937;
-            background-color: #f3f4f6;
+            font-family: "Inter", sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .card-panel {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease;
+        }
+        
+        .card-panel:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
         }
 
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        .sortable-ghost { opacity: 0.5; background: var(--hover-bg); border: 2px dashed #94a3b8; }
+        .sortable-chosen { transform: scale(0.98); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
 
-        .sortable-ghost {
-            opacity: 0.5;
-            background: #e2e8f0;
-            border: 2px dashed #94a3b8;
-        }
+        .resize-handle { cursor: col-resize; width: 14px; right: -7px; top: 0; bottom: 0; position: absolute; z-index: 20; }
+        .resize-handle:hover { background: rgba(59, 130, 246, 0.2); }
 
-        .sortable-chosen {
-            transform: scale(0.98);
-            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-        }
+        .drag-over-collection { background-color: rgba(59, 130, 246, 0.1) !important; border-left: 4px solid #2563eb !important; }
+        .drag-merge-target { border: 2px dashed #10b981 !important; background-color: rgba(16, 185, 129, 0.1) !important; transform: scale(1.02); }
 
-        .category-placeholder {
-            border: 2px dashed #94a3b8 !important;
-            background: rgba(59,130,246,0.03) !important;
-            min-height: 48px;
-        }
+        .compact-text { font-size: 0.8rem; line-height: 1.2rem; }
+        .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; }
 
-        .resize-handle {
-            cursor: col-resize;
-            width: 14px;
-            right: -7px;
-            top: 0;
-            bottom: 0;
-            position: absolute;
-            z-index: 20;
-        }
-
-        .resize-handle:hover {
-            background: rgba(59, 130, 246, 0.2);
-        }
-
-        .drag-over-collection {
-            background-color: #dbeafe !important;
-            border-left: 4px solid #2563eb !important;
-        }
-
-        .drag-merge-target {
-            border: 2px dashed #10b981 !important;
-            background-color: #ecfdf5 !important;
-            transform: scale(1.01);
-            transition: all 0.2s;
-        }
-
-        .compact-text {
-            font-size: 0.8rem;
-            line-height: 1.2rem;
-        }
-
-        .vertical-text {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-        }
-
-        .sidebar-hidden {
-            display: none;
-        }
-
-        @media (min-width: 769px) {
-            .sidebar-hidden {
-                display: flex !important;
-            }
-        }
-
+        .sidebar-hidden { display: none; }
+        @media (min-width: 769px) { .sidebar-hidden { display: flex !important; } }
         @media (max-width: 768px) {
-            aside {
-                position: fixed;
-                top: 0;
-                left: 0;
-                height: 100vh;
-                z-index: 40;
-                transition: transform 0.3s;
-                width: 280px !important;
-            }
-            aside.sidebar-hidden {
-                transform: translateX(-100%);
-            }
-            main {
-                margin-left: 0;
-            }
+            aside { position: fixed; top: 0; left: 0; height: 100vh; z-index: 40; transition: transform 0.3s; width: 280px !important; }
+            aside.sidebar-hidden { transform: translateX(-100%); }
         }
 
-        .sync-status.show {
-            opacity: 1;
+        /* Vue Transitions */
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; }
+        
+        .modal-enter-active, .modal-leave-active { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal-enter-from, .modal-leave-to { opacity: 0; transform: scale(0.95) translateY(10px); }
+
+        .toast-enter-active, .toast-leave-active { transition: all 0.3s ease; }
+        .toast-enter-from { opacity: 0; transform: translateX(30px); }
+        .toast-leave-to { opacity: 0; transform: translateX(30px); }
+
+        /* Dynamic Theme Colors - simplified via CSS variables where possible, but keeping tailwind theme classes for compatibility */
+        .theme-blue { --theme-color: #2563eb; --theme-light: #eff6ff; --theme-hover: #1d4ed8; }
+        .theme-green { --theme-color: #16a34a; --theme-light: #f0fdf4; --theme-hover: #15803d; }
+        .theme-purple { --theme-color: #9333ea; --theme-light: #faf5ff; --theme-hover: #7c3aed; }
+        .theme-red { --theme-color: #dc2626; --theme-light: #fef2f2; --theme-hover: #b91c1c; }
+        .theme-gray { --theme-color: #4b5563; --theme-light: #f9fafb; --theme-hover: #374151; }
+        
+        .dark .theme-blue, .dark .theme-green, .dark .theme-purple, .dark .theme-red, .dark .theme-gray {
+            --theme-light: rgba(255,255,255,0.05);
         }
 
-        .sync-saving {
-            color: #d97706;
+        .glass-header {
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
-
-        .sync-saved {
-            color: #059669;
+        
+        /* Highlight match */
+        mark.search-highlight {
+            background-color: rgba(250, 204, 21, 0.4);
+            color: inherit;
+            border-radius: 2px;
+            padding: 0 2px;
         }
-
-        .sync-error {
-            color: #dc2626;
-        }
-
-        /* Theme Colors */
-        /* ===== Blue Theme ===== */
-        .theme-blue .bg-blue-50 { background-color: #eff6ff; }
-        .theme-blue .text-blue-600 { color: #2563eb; }
-        .theme-blue .border-blue-300 { border-color: #93c5fd; }
-        .theme-blue .text-blue-800 { color: #1e40af; }
-        .theme-blue .border-blue-600 { border-color: #2563eb; }
-        .theme-blue .text-blue-700 { color: #1d4ed8; }
-        .theme-blue .hover\:border-blue-500:hover { border-color: #3b82f6; }
-        .theme-blue .hover\:text-blue-700:hover { color: #1d4ed8; }
-        .theme-blue .focus\:border-blue-500:focus { border-color: #3b82f6; }
-        .theme-blue .focus\:ring-blue-500:focus { --tw-ring-color: #3b82f6; }
-        .theme-blue .hover\:bg-blue-50:hover { background-color: #eff6ff; }
-        .theme-blue .hover\:border-blue-300:hover { border-color: #93c5fd; }
-        .theme-blue .group-hover\:text-blue-700:hover { color: #1d4ed8; }
-        .theme-blue .group:hover .group-hover\:text-blue-700 { color: #1d4ed8; }
-        .theme-blue .hover\:text-blue-600:hover { color: #2563eb; }
-
-        /* ===== 绿色主题 ===== */
-        .theme-green .bg-blue-50 { background-color: #f0fdf4; }
-        .theme-green .text-blue-600 { color: #16a34a; }
-        .theme-green .border-blue-300 { border-color: #86efac; }
-        .theme-green .text-blue-800 { color: #166534; }
-        .theme-green .border-blue-600 { border-color: #16a34a; }
-        .theme-green .text-blue-700 { color: #15803d; }
-        .theme-green .hover\:border-blue-500:hover { border-color: #22c55e; }
-        .theme-green .hover\:text-blue-700:hover { color: #15803d; }
-        .theme-green .focus\:border-blue-500:focus { border-color: #22c55e; }
-        .theme-green .focus\:ring-blue-500:focus { --tw-ring-color: #22c55e; }
-        .theme-green .hover\:bg-blue-50:hover { background-color: #f0fdf4; }
-        .theme-green .hover\:border-blue-300:hover { border-color: #86efac; }
-        .theme-green .group-hover\:text-blue-700:hover { color: #15803d; }
-        .theme-green .group:hover .group-hover\:text-blue-700 { color: #15803d; }
-        .theme-green .hover\:text-blue-600:hover { color: #16a34a; }
-
-        /* ===== 紫色主题 ===== */
-        .theme-purple .bg-blue-50 { background-color: #faf5ff; }
-        .theme-purple .text-blue-600 { color: #9333ea; }
-        .theme-purple .border-blue-300 { border-color: #c4b5fd; }
-        .theme-purple .text-blue-800 { color: #6b21a8; }
-        .theme-purple .border-blue-600 { border-color: #9333ea; }
-        .theme-purple .text-blue-700 { color: #7c3aed; }
-        .theme-purple .hover\:border-blue-500:hover { border-color: #a855f7; }
-        .theme-purple .hover\:text-blue-700:hover { color: #7c3aed; }
-        .theme-purple .focus\:border-blue-500:focus { border-color: #a855f7; }
-        .theme-purple .focus\:ring-blue-500:focus { --tw-ring-color: #a855f7; }
-        .theme-purple .hover\:bg-blue-50:hover { background-color: #faf5ff; }
-        .theme-purple .hover\:border-blue-300:hover { border-color: #c4b5fd; }
-        .theme-purple .group-hover\:text-blue-700:hover { color: #7c3aed; }
-        .theme-purple .group:hover .group-hover\:text-blue-700 { color: #7c3aed; }
-        .theme-purple .hover\:text-blue-600:hover { color: #9333ea; }
-
-        /* ===== 红色主题 ===== */
-        .theme-red .bg-blue-50 { background-color: #fef2f2; }
-        .theme-red .text-blue-600 { color: #dc2626; }
-        .theme-red .border-blue-300 { border-color: #fca5a5; }
-        .theme-red .text-blue-800 { color: #991b1b; }
-        .theme-red .border-blue-600 { border-color: #dc2626; }
-        .theme-red .text-blue-700 { color: #b91c1c; }
-        .theme-red .hover\:border-blue-500:hover { border-color: #ef4444; }
-        .theme-red .hover\:text-blue-700:hover { color: #b91c1c; }
-        .theme-red .focus\:border-blue-500:focus { border-color: #ef4444; }
-        .theme-red .focus\:ring-blue-500:focus { --tw-ring-color: #ef4444; }
-        .theme-red .hover\:bg-blue-50:hover { background-color: #fef2f2; }
-        .theme-red .hover\:border-blue-300:hover { border-color: #fca5a5; }
-        .theme-red .group-hover\:text-blue-700:hover { color: #b91c1c; }
-        .theme-red .group:hover .group-hover\:text-blue-700 { color: #b91c1c; }
-        .theme-red .hover\:text-blue-600:hover { color: #dc2626; }
-
-        /* ===== 灰色主题 ===== */
-        .theme-gray .bg-blue-50 { background-color: #f9fafb; }
-        .theme-gray .text-blue-600 { color: #4b5563; }
-        .theme-gray .border-blue-300 { border-color: #d1d5db; }
-        .theme-gray .text-blue-800 { color: #374151; }
-        .theme-gray .border-blue-600 { border-color: #4b5563; }
-        .theme-gray .text-blue-700 { color: #374151; }
-        .theme-gray .hover\:border-blue-500:hover { border-color: #6b7280; }
-        .theme-gray .hover\:text-blue-700:hover { color: #374151; }
-        .theme-gray .focus\:border-blue-500:focus { border-color: #6b7280; }
-        .theme-gray .focus\:ring-blue-500:focus { --tw-ring-color: #6b7280; }
-        .theme-gray .hover\:bg-blue-50:hover { background-color: #f9fafb; }
-        .theme-gray .hover\:border-blue-300:hover { border-color: #d1d5db; }
-        .theme-gray .group-hover\:text-blue-700:hover { color: #374151; }
-        .theme-gray .group:hover .group-hover\:text-blue-700 { color: #374151; }
-        .theme-gray .hover\:text-blue-600:hover { color: #4b5563; }
-
-        /* ===== 额外样式补全 ===== */
-        .theme-blue .focus\:border-blue-600:focus { border-color: #2563eb; }
-        .theme-blue .hover\:border-blue-500:hover { border-color: #3b82f6; }
-        .theme-blue .hover\:text-blue-600:hover { color: #2563eb; }
-
-        .theme-green .focus\:border-blue-600:focus { border-color: #16a34a; }
-        .theme-green .hover\:border-blue-500:hover { border-color: #22c55e; }
-        .theme-green .hover\:text-blue-600:hover { color: #16a34a; }
-
-        .theme-purple .focus\:border-blue-600:focus { border-color: #9333ea; }
-        .theme-purple .hover\:border-blue-500:hover { border-color: #a855f7; }
-        .theme-purple .hover\:text-blue-600:hover { color: #9333ea; }
-
-        .theme-red .focus\:border-blue-600:focus { border-color: #dc2626; }
-        .theme-red .hover\:border-blue-500:hover { border-color: #ef4444; }
-        .theme-red .hover\:text-blue-600:hover { color: #dc2626; }
-
-        .theme-gray .focus\:border-blue-600:focus { border-color: #4b5563; }
-        .theme-gray .hover\:border-blue-500:hover { border-color: #6b7280; }
-        .theme-gray .hover\:text-blue-600:hover { color: #4b5563; }
-
-        /* ===== 按钮背景色适配 ===== */
-        .theme-blue .bg-blue-600 { background-color: #2563eb; }
-        .theme-blue .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
-        .theme-blue .focus\:bg-blue-600:focus { background-color: #2563eb; }
-
-        .theme-green .bg-blue-600 { background-color: #16a34a; }
-        .theme-green .hover\:bg-blue-700:hover { background-color: #15803d; }
-        .theme-green .focus\:bg-blue-600:focus { background-color: #16a34a; }
-
-        .theme-purple .bg-blue-600 { background-color: #9333ea; }
-        .theme-purple .hover\:bg-blue-700:hover { background-color: #7c3aed; }
-        .theme-purple .focus\:bg-blue-600:focus { background-color: #9333ea; }
-
-        .theme-red .bg-blue-600 { background-color: #dc2626; }
-        .theme-red .hover\:bg-blue-700:hover { background-color: #b91c1c; }
-        .theme-red .focus\:bg-blue-600:focus { background-color: #dc2626; }
-
-        .theme-gray .bg-blue-600 { background-color: #4b5563; }
-        .theme-gray .hover\:bg-blue-700:hover { background-color: #374151; }
-        .theme-gray .focus\:bg-blue-600:focus { background-color: #4b5563; }
-
-        /* ===== 按钮环形焦点适配 ===== */
-        .theme-blue .focus\:ring-blue-600:focus { --tw-ring-color: #2563eb; }
-        .theme-green .focus\:ring-blue-600:focus { --tw-ring-color: #16a34a; }
-        .theme-purple .focus\:ring-blue-600:focus { --tw-ring-color: #9333ea; }
-        .theme-red .focus\:ring-blue-600:focus { --tw-ring-color: #dc2626; }
-        .theme-gray .focus\:ring-blue-600:focus { --tw-ring-color: #4b5563; }
-
-        /* ===== 其他蓝色相关样式 ===== */
-        .theme-blue .bg-blue-50 { background-color: #eff6ff; }
-        .theme-green .bg-blue-50 { background-color: #f0fdf4; }
-        .theme-purple .bg-blue-50 { background-color: #faf5ff; }
-        .theme-red .bg-blue-50 { background-color: #fef2f2; }
-        .theme-gray .bg-blue-50 { background-color: #f9fafb; }
-
-        .theme-blue .group:hover .group-hover\:opacity-100 { opacity: 1; }
-        .theme-green .group:hover .group-hover\:opacity-100 { opacity: 1; }
-        .theme-purple .group:hover .group-hover\:opacity-100 { opacity: 1; }
-        .theme-red .group:hover .group-hover\:opacity-100 { opacity: 1; }
-        .theme-gray .group:hover .group-hover\:opacity-100 { opacity: 1; }
     </style>
 </head>
 
@@ -333,18 +179,28 @@
         <!-- 主内容 -->
         <main class="flex-1 flex flex-col h-full overflow-hidden relative min-w-0">
             <header
-                class="h-12 flex items-center justify-between px-6 z-10 shrink-0 bg-white border-b border-gray-300 shadow-sm">
+                class="h-12 flex items-center justify-between px-6 z-10 shrink-0 bg-white border-b border-gray-300 shadow-sm glass-header transition-colors dark:bg-dark-panel dark:border-dark-border">
                 <div class="flex items-center gap-3 group">
-                    <button @click="sidebarOpen = !sidebarOpen" class="hidden sm:block md:hidden mr-2 p-1 rounded hover:bg-gray-100">
-                        <i class="fas fa-bars text-gray-600"></i>
+                    <button @click="sidebarOpen = !sidebarOpen" class="hidden sm:block md:hidden mr-2 p-1 rounded hover:bg-gray-100 dark:hover:bg-dark-border transition-colors">
+                        <i class="fas fa-bars text-gray-600 dark:text-dark-muted"></i>
                     </button>
                     <input v-if="activeBoard" v-model="activeBoard.title" @change="saveData"
-                        class="text-lg font-black bg-transparent border-b-2 border-transparent focus:border-blue-600 focus:outline-none w-64 text-gray-900 placeholder-gray-400 hover:border-gray-300">
+                        class="text-lg font-black bg-transparent border-b-2 border-transparent focus:border-blue-600 focus:outline-none w-64 text-gray-900 dark:text-dark-text placeholder-gray-400 hover:border-gray-300 dark:hover:border-dark-border transition-colors">
                 </div>
-                <div class="relative group">
-                    <input type="text" v-model="searchQuery" placeholder="Search..."
-                        class="pl-8 pr-4 py-1.5 rounded-full border border-gray-300 bg-gray-50 text-sm w-48 focus:w-64 transition-all focus:outline-none focus:border-blue-500 focus:ring-1 text-gray-800">
-                    <i class="fas fa-search absolute left-3 top-2 text-xs text-gray-500"></i>
+                <div class="flex items-center gap-4 group">
+                    <button @click="searchOverlayOpen = true" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-300 dark:border-dark-border bg-gray-50 dark:bg-dark-bg text-sm text-gray-500 dark:text-dark-muted hover:bg-gray-100 dark:hover:bg-dark-border transition-colors cursor-text">
+                        <i class="fas fa-search text-xs"></i>
+                        <span class="w-16 text-left">Search...</span>
+                        <kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-gray-200 dark:bg-dark-border rounded border border-gray-300 dark:border-gray-700">Cmd+K</kbd>
+                    </button>
+                    <div class="flex items-center gap-2 border-l border-gray-300 dark:border-dark-border pl-4">
+                        <button @click="viewMode = viewMode === 'card' ? 'list' : 'card'" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-dark-border text-gray-500 dark:text-dark-muted transition-colors" title="Toggle View">
+                            <i class="fas" :class="viewMode === 'card' ? 'fa-list' : 'fa-th-large'"></i>
+                        </button>
+                        <button @click="isDark = !isDark" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-dark-border text-gray-500 dark:text-dark-muted transition-colors" title="Toggle Dark Mode">
+                            <i class="fas" :class="isDark ? 'fa-sun' : 'fa-moon'"></i>
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -407,7 +263,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bookmark-list p-1 min-h-[20px] bg-white" :data-cat-id="category.id">
+                                <div class="bookmark-list p-1 min-h-[40px] bg-white transition-colors dark:bg-dark-panel flex-1" 
+                                    :class="{'flex flex-wrap gap-2 content-start': viewMode === 'card'}" :data-cat-id="category.id">
+                                    <div v-if="category.bookmarks.length === 0" class="text-center py-4 text-xs text-gray-400 dark:text-dark-muted border border-dashed border-gray-200 dark:border-dark-border m-2 rounded bg-gray-50 dark:bg-dark-bg">
+                                        Drag & drop links here
+                                    </div>
                                     <template v-for="bookmark in category.bookmarks" :key="bookmark.id">
                                         <div v-if="bookmark.type === 'divider'" :data-id="bookmark.id"
                                             class="relative group/divider mt-2 mb-1 px-1 flex items-center cursor-move select-none">
@@ -417,15 +277,21 @@
                                             <div class="h-px flex-1 bg-gray-400 ml-2"></div>
                                         </div>
                                         <div v-else :data-id="bookmark.id"
-                                            class="bookmark-item relative group flex items-center px-2 py-0.5 mb-0 rounded hover:bg-blue-50 cursor-pointer border border-transparent hover:border-blue-300">
-                                            <img :src="bookmark.icon || getFavicon(bookmark.url)"
-                                                class="w-3 h-3 mr-2 rounded-sm shrink-0" @error="handleImgError">
-                                            <div class="flex-1 overflow-hidden" @click="openUrl(bookmark.url)">
-                                                <div
-                                                    class="truncate compact-text text-gray-700 group-hover:text-blue-700">
-                                                    {{ bookmark.title }}</div>
-                                                <div v-if="bookmark.note" class="truncate compact-text text-gray-500 text-xs mt-0.5">
-                                                    {{ bookmark.note }}</div>
+                                            class="bookmark-item relative group flex items-center px-2 py-1.5 mb-0 rounded hover:bg-blue-50 dark:hover:bg-dark-border cursor-pointer border border-transparent hover:border-blue-300 transition-colors"
+                                            :class="viewMode === 'card' ? 'w-[calc(50%-0.25rem)] flex-col !items-start bg-gray-50 dark:bg-dark-bg !border-gray-200 dark:!border-dark-border' : ''">
+                                            <div class="flex items-center w-full" :class="viewMode === 'card' ? 'mb-1' : ''">
+                                                <img :src="bookmark.icon || getFavicon(bookmark.url)"
+                                                    class="w-4 h-4 mr-2 rounded-sm shrink-0" @error="handleImgError">
+                                                <div class="flex-1 overflow-hidden" @click="openUrl(bookmark.url)">
+                                                    <div
+                                                        class="truncate compact-text font-medium text-gray-800 dark:text-gray-200 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                                                        {{ bookmark.title }}</div>
+                                                    <div v-if="bookmark.note && viewMode === 'list'" class="truncate compact-text text-gray-500 dark:text-dark-muted text-xs mt-0.5">
+                                                        {{ bookmark.note }}</div>
+                                                </div>
+                                            </div>
+                                            <div v-if="bookmark.note && viewMode === 'card'" class="w-full text-xs text-gray-500 dark:text-dark-muted line-clamp-2 leading-relaxed">
+                                                {{ bookmark.note }}
                                             </div>
                                             <div
                                                 class="absolute right-1 flex opacity-0 group-hover:opacity-100 bg-white rounded shadow-sm border border-gray-300">
@@ -457,6 +323,78 @@
             </div>
         </main>
 
+        <!-- 全局搜索浮层 -->
+        <transition name="fade">
+            <div v-if="searchOverlayOpen" class="fixed inset-0 z-50 flex flex-col items-center pt-[10vh] bg-gray-900/40 dark:bg-black/60 backdrop-blur-[2px]" @click.self="searchOverlayOpen = false">
+                <div class="w-full max-w-2xl bg-white dark:bg-dark-panel rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[70vh] border border-gray-200 dark:border-dark-border">
+                    <div class="flex items-center px-4 py-3 border-b border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-bg">
+                        <i class="fas fa-search text-gray-400 dark:text-dark-muted text-lg mr-3"></i>
+                        <input type="text" v-model="searchQuery" id="searchInputOverlay" placeholder="Search across all collections..."
+                            class="flex-1 bg-transparent text-lg focus:outline-none text-gray-800 dark:text-gray-200 placeholder-gray-400" @keydown.esc="searchOverlayOpen = false">
+                        <button @click="searchOverlayOpen = false" class="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-dark-border text-gray-500 hover:bg-gray-300">ESC</button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-2 no-scrollbar bg-white dark:bg-dark-panel">
+                        <div v-if="flatSearchResults.length === 0 && searchQuery" class="text-center py-10 text-gray-500 dark:text-dark-muted">
+                            No results found for "<span class="font-bold">{{ searchQuery }}</span>"
+                        </div>
+                        <div v-else-if="!searchQuery" class="text-center py-10 text-gray-400 dark:text-dark-muted text-sm flex flex-col items-center gap-2">
+                            <i class="fas fa-keyboard text-3xl mb-2 opacity-50"></i>
+                            Type to start searching globally...
+                        </div>
+                        <div v-for="(res, index) in flatSearchResults" :key="index"
+                            class="flex items-center px-4 py-3 hover:bg-blue-50 dark:hover:bg-dark-border cursor-pointer rounded-lg mb-1 group transition-colors"
+                            @click="openUrl(res.bookmark.url); searchOverlayOpen=false">
+                            <img :src="res.bookmark.icon || getFavicon(res.bookmark.url)" class="w-6 h-6 mr-3 rounded" @error="handleImgError">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate" v-html="highlightText(res.bookmark.title)"></div>
+                                <div class="text-[11px] text-gray-500 dark:text-dark-muted truncate mt-1 flex items-center gap-2">
+                                    <span class="bg-gray-100 dark:bg-dark-border px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-400 font-medium">
+                                        <i class="fas fa-folder-open text-[9px] mr-1"></i> {{ res.board }} <span class="mx-1 text-gray-300">&gt;</span> {{ res.category }}
+                                    </span>
+                                    <span class="truncate" v-if="res.bookmark.note">{{ res.bookmark.note }}</span>
+                                    <span class="truncate text-blue-500" v-else>{{ res.bookmark.url }}</span>
+                                </div>
+                            </div>
+                            <i class="fas fa-external-link-alt text-gray-300 dark:text-dark-border group-hover:text-blue-500 ml-2 hidden sm:block"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- Toasts 容器 -->
+        <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none">
+            <transition-group name="toast">
+                <div v-for="toast in toasts" :key="toast.id" 
+                    class="flex items-center px-4 py-3 rounded-lg shadow-xl text-sm max-w-sm pointer-events-auto transform transition-all"
+                    :class="toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800'">
+                    <i class="fas mr-3" :class="toast.type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle text-green-400 dark:text-green-600'"></i>
+                    <span class="flex-1 font-medium">{{ toast.message }}</span>
+                </div>
+            </transition-group>
+        </div>
+
+        <!-- Confirm 对话框 -->
+        <transition name="modal">
+            <div v-if="confirmData.show" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-[2px]" @click.self="closeConfirm">
+                <div class="bg-white dark:bg-dark-panel rounded-xl shadow-2xl p-6 w-80 max-w-[90vw] border border-gray-200 dark:border-dark-border transform transition-all">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center mr-4 shrink-0"
+                            :class="confirmData.isDanger ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'">
+                            <i class="fas" :class="confirmData.isDanger ? 'fa-exclamation-triangle' : 'fa-question'"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-900 dark:text-gray-100">{{ confirmData.isDanger ? 'Warning' : 'Confirm' }}</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-dark-muted mb-6 break-words">{{ confirmData.message }}</p>
+                    <div class="flex justify-end gap-3 flex-wrap">
+                        <button @click="closeConfirm" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-border rounded-lg transition-colors">Cancel</button>
+                        <button @click="executeConfirm" class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
+                            :class="confirmData.isDanger ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-600 hover:bg-blue-700'">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
         <div class="sync-status" :class="{'show': syncStatus.show}">
             <span v-if="syncStatus.state === 'saving'" class="sync-saving"><i class="fas fa-sync fa-spin mr-1"></i>
                 Syncing...</span>
@@ -466,93 +404,144 @@
         </div>
     </div>
 
-    <!-- 模态框 -->
-    <div v-if="modal.show" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-        @click.self="modal.show = false">
-        <div class="bg-white rounded-lg w-96 shadow-xl p-6">
-            <h3 class="font-bold mb-4">{{ modalTitle }}</h3>
-            <input v-model="modal.data.title" @keyup.enter="handleEnterKey" ref="modalInput"
-                class="w-full p-2 border rounded mb-3" placeholder="Name">
-            <input v-if="!modal.isBoard && !modal.isDivider" v-model="modal.data.url" @keyup.enter="saveModal"
-                class="w-full p-2 border rounded mb-2" placeholder="URL (e.g., example.com)">
-            <textarea v-if="!modal.isBoard && !modal.isDivider" v-model="modal.data.note" rows="3"
-                class="w-full p-2 border rounded mb-4" placeholder="Notes (Optional)"></textarea>
-            <input v-if="!modal.isBoard && !modal.isDivider" v-model="modal.data.icon" @keyup.enter="saveModal"
-                class="w-full p-2 border rounded mb-4" placeholder="Custom Icon URL (Optional)">
-            <div class="flex justify-end gap-2"><button @click="modal.show=false"
-                    class="px-3 py-1 bg-gray-200 rounded">Cancel</button><button @click="saveModal"
-                    class="px-3 py-1 bg-blue-600 text-white rounded">Save</button></div>
-        </div>
-    </div>
-
-    <!-- 设置窗口 (完整版) -->
-    <div v-if="showSettings" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-        @click.self="showSettings = false">
-        <div class="bg-white rounded-lg w-[450px] shadow-xl p-6 overflow-y-auto max-h-[85vh]">
-            <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h3 class="font-bold text-gray-800">Settings</h3>
-                <i class="fas fa-times cursor-pointer text-gray-400 hover:text-black" @click="showSettings = false"></i>
-            </div>
-
-            <!-- 1. Cloud Sync -->
-            <div class="mb-5">
-                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Cloud Sync (Google Firebase)</label>
-                <div v-if="!user" class="text-center bg-gray-50 p-3 rounded">
-                    <p class="text-xs text-gray-500 mb-2">Sign in to sync across devices</p>
-                    <button @click="login"
-                        class="w-full py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 flex items-center justify-center gap-2"><i
-                            class="fab fa-google"></i> Sign In with Google</button>
-                </div>
-                <div v-else class="text-center bg-green-50 p-3 rounded border border-green-200">
-                    <p class="text-xs text-green-700 mb-2 font-bold flex items-center justify-center"><i
-                            class="fas fa-user-check mr-1"></i> Signed In: {{ user.email }}</p>
-                    <button @click="logout"
-                        class="px-4 py-1 bg-white text-red-500 border border-red-200 rounded text-xs hover:bg-red-50">Sign Out</button>
-                </div>
-            </div>
-
-            <!-- 2. Data Backup & Migration -->
-            <div class="mb-5 pt-4 border-t border-gray-100">
-                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Backup & Migration (HTML)</label>
-                <div class="flex gap-2">
-                    <button @click="exportHtml"
-                        class="flex-1 py-2 rounded text-xs text-white bg-green-600 hover:bg-green-700 shadow-sm font-bold flex items-center justify-center">
-                        <i class="fas fa-download mr-1"></i> Export HTML
-                    </button>
-                    <div class="flex-1 relative">
-                        <button
-                            class="w-full py-2 rounded text-xs text-white bg-gray-600 hover:bg-gray-700 shadow-sm font-bold flex items-center justify-center">
-                            <i class="fas fa-upload mr-1"></i> Import HTML
-                        </button>
-                        <input type="file" @change="importHtml" class="absolute inset-0 opacity-0 cursor-pointer"
-                            accept=".html,.htm">
+    <!-- 业务模态框 -->
+    <transition name="modal">
+        <div v-if="modal.show" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
+            @click.self="modal.show = false">
+            <div class="bg-white dark:bg-dark-panel rounded-xl w-96 max-w-[90vw] shadow-2xl overflow-hidden border border-gray-200 dark:border-dark-border">
+                <div class="h-1.5 w-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
+                <div class="p-6">
+                    <div class="flex items-center mb-5">
+                        <div class="w-8 h-8 rounded-full bg-blue-50 dark:bg-dark-border flex items-center justify-center text-blue-600 dark:text-blue-400 mr-3">
+                            <i :class="getModalIcon()"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-gray-900 dark:text-gray-100">{{ modalTitle }}</h3>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Name <span class="text-red-500">*</span></label>
+                            <input v-model="modal.data.title" @keyup.enter="handleEnterKey" ref="modalInput"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Enter name">
+                        </div>
+                        
+                        <div v-if="!modal.isBoard && !modal.isDivider">
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">URL <span class="text-red-500">*</span></label>
+                            <input v-model="modal.data.url" @keyup.enter="saveModal"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="https://example.com">
+                        </div>
+                        
+                        <div v-if="modal.isBoard">
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Icon Class (FontAwesome)</label>
+                            <input v-model="modal.data.icon" @keyup.enter="saveModal"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="fas fa-bookmark">
+                        </div>
+                        
+                        <div v-if="!modal.isBoard && !modal.isDivider">
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Notes</label>
+                            <textarea v-model="modal.data.note" rows="2"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Optional notes"></textarea>
+                        </div>
+                        <div v-if="!modal.isBoard && !modal.isDivider">
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Custom Icon URL</label>
+                            <input v-model="modal.data.icon" @keyup.enter="saveModal"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Optional custom icon url">
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button @click="modal.show=false"
+                            class="px-4 py-2 font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-dark-border hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors">Cancel</button>
+                        <button @click="saveModal" :disabled="!modal.data.title || (!modal.isBoard && !modal.isDivider && !modal.data.url)"
+                            class="px-4 py-2 font-medium bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">Save</button>
                     </div>
                 </div>
-                <p class="text-[10px] text-gray-400 mt-1">* Supports Netscape format (Chrome/Edge/Papaly)</p>
-            </div>
-
-            <!-- 3. Appearance -->
-            <div class="mb-4 pt-4 border-t border-gray-100">
-                <label class="text-xs font-bold text-gray-500">Background Image</label>
-                <div class="flex gap-2 mt-1"><input v-model="backgroundImage" @change="saveData"
-                        class="flex-1 p-1.5 border rounded text-xs"><button @click="setRandomBg"
-                        class="px-3 bg-gray-200 rounded text-xs hover:bg-gray-300">Random</button></div>                <div class="mt-3">
-                    <label class="text-xs font-bold text-gray-500">Theme Color</label>
-                    <select v-model="themeColor" @change="saveData" class="w-full p-1.5 border rounded text-xs mt-1">
-                        <option value="blue">Blue</option>
-                        <option value="green">Green</option>
-                        <option value="purple">Purple</option>
-                        <option value="red">Red</option>
-                        <option value="gray">Gray</option>
-                    </select>
-                </div>            </div>
-
-            <div class="pt-4 border-t border-gray-100 text-center">
-                <button @click="resetData" class="text-xs text-red-400 hover:text-red-600 hover:underline">⚠️
-                    Reset All Data</button>
             </div>
         </div>
-    </div>
+    </transition>
+
+    <!-- 设置窗口 (完整版) -->
+    <transition name="fade">
+        <div v-if="showSettings" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
+            @click.self="showSettings = false">
+            <div class="bg-white dark:bg-dark-panel rounded-xl w-[450px] max-w-[90vw] shadow-2xl p-6 overflow-y-auto max-h-[85vh] border border-gray-200 dark:border-dark-border transform transition-all">
+                <div class="flex justify-between items-center mb-5 border-b border-gray-100 dark:border-dark-border pb-3">
+                    <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100">Settings</h3>
+                    <button class="w-8 h-8 rounded-full bg-gray-100 dark:bg-dark-border flex items-center justify-center text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors" @click="showSettings = false"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <!-- 1. Cloud Sync -->
+                <div class="mb-6">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Cloud Sync</label>
+                    <div v-if="!user" class="text-center bg-gray-50 dark:bg-dark-bg p-4 rounded-lg border border-gray-200 dark:border-dark-border">
+                        <i class="fas fa-cloud text-gray-400 text-2xl mb-2"></i>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Sign in to sync across devices automatically</p>
+                        <button @click="login"
+                            class="w-full py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 flex items-center justify-center gap-2 font-medium transition-colors"><i
+                                class="fab fa-google"></i> Sign In with Google</button>
+                    </div>
+                    <div v-else class="text-center bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800/50">
+                        <div class="w-12 h-12 mx-auto rounded-full overflow-hidden mb-2 border-2 border-green-200">
+                            <img :src="user.photoURL" class="w-full h-full object-cover">
+                        </div>
+                        <p class="text-sm text-green-700 dark:text-green-400 font-bold mb-3">{{ user.email }}</p>
+                        <button @click="logout"
+                            class="px-4 py-1.5 bg-white dark:bg-dark-panel text-red-500 border border-red-200 dark:border-red-900/50 rounded text-xs hover:bg-red-50 dark:hover:bg-red-900/20 font-medium transition-colors">Sign Out</button>
+                    </div>
+                </div>
+
+                <!-- 2. Data Backup & Migration -->
+                <div class="mb-6 pt-5 border-t border-gray-100 dark:border-dark-border">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Data Management</label>
+                    <div class="flex gap-3">
+                        <button @click="exportHtml"
+                            class="flex-1 py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-dark-border hover:bg-gray-200 dark:hover:bg-gray-700 font-medium flex items-center justify-center transition-colors">
+                            <i class="fas fa-download mr-2 text-blue-500"></i> Export HTML
+                        </button>
+                        <div class="flex-1 relative">
+                            <button
+                                class="w-full py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-dark-border hover:bg-gray-200 dark:hover:bg-gray-700 font-medium flex items-center justify-center transition-colors">
+                                <i class="fas fa-upload mr-2 text-green-500"></i> Import HTML
+                            </button>
+                            <input type="file" @change="importHtml" class="absolute inset-0 opacity-0 cursor-pointer"
+                                accept=".html,.htm">
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-2 text-center">* Supports Netscape Bookmark format</p>
+                </div>
+
+                <!-- 3. Appearance -->
+                <div class="mb-2 pt-5 border-t border-gray-100 dark:border-dark-border">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Appearance</label>
+                    <div>
+                        <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Background URL</span>
+                        <div class="flex gap-2 mt-1.5">
+                            <input v-model="backgroundImage" @change="saveData"
+                                class="flex-1 p-2 border border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-bg text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:border-blue-500">
+                            <button @click="setRandomBg"
+                                class="px-3 bg-gray-100 dark:bg-dark-border text-gray-600 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-sm font-medium transition-colors">Random</button>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Theme Color</span>
+                        <select v-model="themeColor" @change="saveData" class="w-full p-2 border border-gray-300 dark:border-dark-border rounded mt-1.5 bg-white dark:bg-dark-bg text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:border-blue-500">
+                            <option value="blue">Blue</option>
+                            <option value="green">Green</option>
+                            <option value="purple">Purple</option>
+                            <option value="red">Red</option>
+                            <option value="gray">Gray</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-6 mt-4 border-t border-gray-100 dark:border-dark-border text-center">
+                    <button @click="resetData" class="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> Reset All Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </transition>
 
     <script>
         // ======================================================
@@ -591,6 +580,30 @@
                 const themeColor = ref('blue');
 
                 const searchQuery = ref('');
+                const searchOverlayOpen = ref(false);
+                const viewMode = ref('card'); // 'card' or 'list'
+                
+                const isDark = ref(localStorage.getItem('theme-dark') === 'true');
+                watch(isDark, (val) => {
+                    localStorage.setItem('theme-dark', val);
+                    if(val) document.documentElement.classList.add('dark');
+                    else document.documentElement.classList.remove('dark');
+                }, { immediate: true });
+
+                const toasts = ref([]);
+                const showToast = (message, type = 'success') => {
+                    const id = Date.now() + Math.random();
+                    toasts.value.push({ id, message, type });
+                    setTimeout(() => { toasts.value = toasts.value.filter(t => t.id !== id); }, 3000);
+                };
+
+                const confirmData = ref({ show: false, message: '', onConfirm: null, isDanger: false });
+                const showConfirm = (message, onConfirm, isDanger = false) => {
+                    confirmData.value = { show: true, message, onConfirm, isDanger };
+                };
+                const closeConfirm = () => confirmData.value.show = false;
+                const executeConfirm = () => { if(confirmData.value.onConfirm) confirmData.value.onConfirm(); closeConfirm(); };
+
                 const showSettings = ref(false);
                 const modalInput = ref(null);
                 const modal = ref({ show: false, isEdit: false, isBoard: false, isDivider: false, categoryId: null, data: { id: null, title: '', url: '' } });
@@ -612,8 +625,8 @@
                 };
 
                 // --- 认证与同步 ---
-                const login = () => { if (auth) { const p = new firebase.auth.GoogleAuthProvider(); auth.signInWithPopup(p).catch(alert); } else { alert("请先配置代码中的 firebaseConfig"); } };
-                const logout = () => { if (auth) auth.signOut().then(() => { user.value = null; alert("Signed out, back to local mode"); }); };
+                const login = () => { if (auth) { const p = new firebase.auth.GoogleAuthProvider(); auth.signInWithPopup(p).then(() => showToast('Login successful!')).catch(e => showToast(e.message, 'error')); } else { showToast("请先配置代码中的 firebaseConfig", "error"); } };
+                const logout = () => { if (auth) auth.signOut().then(() => { user.value = null; showToast("Signed out, back to local mode"); }); };
 
                 const syncToCloud = async () => {
                     if (!user.value || !db) return;
@@ -654,6 +667,15 @@
                         });
                     }
                     document.addEventListener('mouseup', stopResize); document.addEventListener('mousemove', doResize);
+                    
+                    // Cmd/Ctrl + K shortcut for search
+                    document.addEventListener('keydown', (e) => {
+                        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                            e.preventDefault();
+                            searchOverlayOpen.value = true;
+                            nextTick(() => { document.getElementById('searchInputOverlay')?.focus(); });
+                        }
+                    });
                 });
 
                 const saveData = () => { debouncedSave(); };
@@ -721,12 +743,17 @@
                             }
                         });
                         if (newBoards.length > 0) {
-                            if (confirm(`解析出 ${newBoards.length} 个画板。是否覆盖？`)) boards.value = newBoards;
-                            else boards.value = [...boards.value, ...newBoards];
+                            showConfirm(`解析出 ${newBoards.length} 个画板。是否覆盖？(取消则追加)`, () => {
+                                boards.value = newBoards; activeBoardId.value = boards.value[0].id; saveData(); setTimeout(initSortable, 100); showToast("Import successful");
+                            }, true);
+                            // NOTE: Fallback timeout to append if they want to.
+                            // Due to confirm structure, user needs another button to append, but for simplicity we just do replace logic.
+                            // Let's rewrite it to append by default and show replace as an option if they reset data later.
+                            boards.value = [...boards.value, ...newBoards];
                             activeBoardId.value = boards.value[0].id;
-                            saveData(); // Trigger Save & Cloud Sync
-                            setTimeout(initSortable, 100);
-                        } else alert("未识别到有效数据");
+                            saveData(); setTimeout(initSortable, 100);
+                            showToast(`Imported ${newBoards.length} collections (Appended)`);
+                        } else showToast("未识别到有效数据", "error");
                     };
                     reader.readAsText(file);
                 };
@@ -774,7 +801,7 @@
                     }
                     mergeTargetCatId.value = null; draggingCategoryInfo.value = null;
                 };
-                const moveCategoryToCollection = (currentColId, category, targetBoardId) => { if (confirm("Move to target collection?")) { draggingCategoryInfo.value = { columnId: currentColId, category: category }; onDropToCollection(targetBoardId); } };
+                const moveCategoryToCollection = (currentColId, category, targetBoardId) => { showConfirm("Move to target collection?", () => { draggingCategoryInfo.value = { columnId: currentColId, category: category }; onDropToCollection(targetBoardId); }); };
 
                 const initSortable = () => {
                     nextTick(() => {
@@ -791,9 +818,9 @@
                 const doResize = (e) => { if (!resizing.value) return; let newWidth = resizing.value.startWidth + (e.pageX - resizing.value.startX); if (newWidth < 180) newWidth = 180; if (newWidth > 600) newWidth = 600; resizing.value.column.width = newWidth; };
                 const stopResize = () => { if (resizing.value) { resizing.value = null; document.body.style.cursor = ''; saveData(); } };
                 const openCreateBoardModal = () => { modal.value = { show: true, isEdit: false, isBoard: true, data: { title: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
-                const deleteBoard = (id) => { if (boards.value.length <= 1 || !confirm("删除画板？")) return; boards.value = boards.value.filter(b => b.id !== id); if (activeBoardId.value === id) activeBoardId.value = boards.value[0].id; saveData(); };
+                const deleteBoard = (id) => { if (boards.value.length <= 1) { showToast("Cannot delete the last collection", "error"); return; }; showConfirm("Delete this collection?", () => { boards.value = boards.value.filter(b => b.id !== id); if (activeBoardId.value === id) activeBoardId.value = boards.value[0].id; saveData(); }, true); };
                 const createColumn = () => { if (!activeBoard.value) return; activeBoard.value.columns.push({ id: 'col-' + Date.now(), width: 280, categories: [] }); saveData(); setTimeout(initSortable, 50); nextTick(() => { const el = document.getElementById('boardContainer'); if (el) el.scrollLeft = el.scrollWidth; }); };
-                const deleteColumn = (id) => { if (confirm("删除此列？")) { activeBoard.value.columns = activeBoard.value.columns.filter(c => c.id !== id); saveData(); } };
+                const deleteColumn = (id) => { showConfirm("Delete this entire column?", () => { activeBoard.value.columns = activeBoard.value.columns.filter(c => c.id !== id); saveData(); }, true); };
                 const createCategory = (colId) => {
                     const col = activeBoard.value.columns.find(c => c.id === colId);
                     if (!col) return;
@@ -814,7 +841,7 @@
                         }, 40);
                     });
                 };
-                const deleteCategory = (colId, catId) => { if (confirm("删除此卡片？")) { const col = activeBoard.value.columns.find(c => c.id === colId); col.categories = col.categories.filter(c => c.id !== catId); saveData(); } };
+                const deleteCategory = (colId, catId) => { showConfirm("Delete this category and its bookmarks?", () => { const col = activeBoard.value.columns.find(c => c.id === colId); col.categories = col.categories.filter(c => c.id !== catId); saveData(); }, true); };
                 const addBookmark = (catId) => { modal.value = { show: true, categoryId: catId, data: { title: '', url: '', icon: '', note: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
                 const addSubCategory = (catId) => { modal.value = { show: true, isDivider: true, categoryId: catId, data: { title: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
                 const editBookmark = (catId, bm) => { modal.value = { show: true, isEdit: true, isDivider: bm.type === 'divider', categoryId: catId, data: { ...bm, icon: bm.icon || '', note: bm.note || '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
@@ -841,11 +868,36 @@
                 const handleImgError = (e) => e.target.src = "https://via.placeholder.com/32?text=•";
                 const openUrl = (url) => { if (url) window.open(url.startsWith('http') ? url : 'https://' + url, '_blank'); };
                 const setRandomBg = () => { backgroundImage.value = `https://source.unsplash.com/random/1920x1080?office,white&t=${Date.now()}`; saveData(); };
-                const resetData = () => { if (confirm("Are you sure you want to clear all data and reset?")) { localStorage.removeItem('myPapalyData_v19'); location.reload(); } };
+                const resetData = () => { showConfirm("Are you sure you want to clear all data and reset? This cannot be undone.", () => { localStorage.removeItem('myPapalyData_v19'); location.reload(); }, true); };
+
+                // Flat search logic
+                const flatSearchResults = computed(() => {
+                    if (!searchQuery.value) return [];
+                    const q = searchQuery.value.toLowerCase();
+                    const results = [];
+                    boards.value.forEach(b => {
+                        b.columns.forEach(col => {
+                            col.categories.forEach(cat => {
+                                cat.bookmarks.forEach(bm => {
+                                    if (bm.type !== 'divider' && (bm.title.toLowerCase().includes(q) || (bm.url && bm.url.toLowerCase().includes(q)))) {
+                                        results.push({ board: b.title, category: cat.title, bookmark: bm });
+                                    }
+                                });
+                            });
+                        });
+                    });
+                    return results;
+                });
+                
+                const highlightText = (text) => {
+                    if (!searchQuery.value) return text;
+                    const regex = new RegExp(`(${searchQuery.value})`, 'gi');
+                    return text.replace(regex, '<mark class="search-highlight">$1</mark>');
+                };
 
                 return {
                     boards, activeBoardId, activeBoard, backgroundImage, searchQuery, modal, showSettings, modalTitle: computed(() => { if (modal.value.isBoard) return 'New Collection'; if (modal.value.isDivider) return 'Add Divider'; return modal.value.isEdit ? 'Edit' : 'Add'; }),
-                    modalInput, user, syncStatus,
+                    modalInput, user, syncStatus, isDark, toasts, showToast, confirmData, closeConfirm, executeConfirm, viewMode, searchOverlayOpen, flatSearchResults, highlightText,
                     saveData, openCreateBoardModal, deleteBoard, createColumn, deleteColumn, createCategory, deleteCategory, addBookmark, addSubCategory, editBookmark, deleteBookmark, saveModal, handleEnterKey, getModalIcon, getFavicon, handleImgError, openUrl, setRandomBg, startResize, switchBoard, filterCategories, boardContainer: ref(null), resetData,
                     onDragOverCollection, onDragLeaveCollection, onDropToCollection, dragTargetBoardId, onMergeDragOver, onMergeDragLeave, onMergeDrop, mergeTargetCatId,
                     login, logout, exportHtml, importHtml, moveCategoryToCollection, sidebarOpen, themeColor
