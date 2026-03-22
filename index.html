@@ -138,12 +138,26 @@
         <!-- 左侧 -->
         <aside class="flex flex-col flex-shrink-0 h-full bg-white border-r border-gray-300 z-30 shadow-lg"
             :class="{ 'sidebar-hidden': !sidebarOpen }" style="min-width: max-content;">
-            <div class="h-14 flex flex-col justify-center px-4 border-b border-gray-200 shrink-0 bg-gray-50">
-                <div class="flex items-center justify-center font-bold text-gray-800">
-                    <img src="image/icon.jpeg" class="w-12 h-12" alt="Custom Icon">
+            <div class="py-4 flex flex-col items-center justify-center px-2 border-b border-gray-200 dark:border-dark-border shrink-0 bg-gray-50 dark:bg-dark-panel">
+                <div class="flex items-center justify-center font-bold text-gray-800 mb-2">
+                    <img src="image/icon.jpeg" class="w-16 h-16 rounded-xl shadow-sm" alt="Custom Icon">
                 </div>
-                <div v-if="user" class="text-[10px] text-green-600 mt-1 truncate w-32 flex items-center">
-                    <img :src="user.photoURL" class="w-3 h-3 rounded-full mr-1"> {{ user.displayName }}
+                <div class="h-5 flex items-center justify-center text-[10px] sm:text-xs w-full">
+                    <transition name="fade" mode="out-in">
+                        <div v-if="syncStatus.show" :key="syncStatus.state" class="flex gap-1 items-center font-medium" :class="{
+                            'text-blue-500': syncStatus.state === 'saving',
+                            'text-green-500': syncStatus.state === 'saved',
+                            'text-red-500': syncStatus.state === 'error'
+                        }">
+                            <i v-if="syncStatus.state === 'saving'" class="fas fa-sync fa-spin"></i>
+                            <i v-if="syncStatus.state === 'saved'" class="fas fa-check"></i>
+                            <i v-if="syncStatus.state === 'error'" class="fas fa-exclamation-triangle"></i>
+                            <span>{{ syncStatus.state === 'saving' ? 'Syncing...' : (syncStatus.state === 'saved' ? 'Synced' : 'Sync Failed') }}</span>
+                        </div>
+                        <div v-else-if="user" key="user" class="text-gray-500 dark:text-dark-muted flex items-center justify-center truncate w-full px-2">
+                            <img :src="user.photoURL" class="w-4 h-4 rounded-full mr-1 shrink-0"> <span class="truncate">{{ user.displayName }}</span>
+                        </div>
+                    </transition>
                 </div>
             </div>
 
@@ -394,13 +408,7 @@
             </div>
         </transition>
 
-        <div class="sync-status" :class="{'show': syncStatus.show}">
-            <span v-if="syncStatus.state === 'saving'" class="sync-saving"><i class="fas fa-sync fa-spin mr-1"></i>
-                Syncing...</span>
-            <span v-if="syncStatus.state === 'saved'" class="sync-saved"><i class="fas fa-check mr-1"></i> Synced</span>
-            <span v-if="syncStatus.state === 'error'" class="sync-error"><i
-                    class="fas fa-exclamation-triangle mr-1"></i> Sync Failed (Check Network/Login)</span>
-        </div>
+
     </div>
 
     <!-- 业务模态框 -->
