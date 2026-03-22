@@ -634,6 +634,7 @@
                                 if (doc.exists) {
                                     const d = doc.data();
                                     boards.value = d.boards || []; activeBoardId.value = d.activeBoardId; themeColor.value = d.themeColor || 'blue';
+                                    migrateBoardsFormat(boards.value);
                                     debouncedSave(); setTimeout(initSortable, 100);
                                 } else { syncToCloud(); }
                             }
@@ -652,13 +653,8 @@
                 });
 
                 const saveData = () => { debouncedSave(); };
-                const loadLocalData = () => {
-                    let saved = localStorage.getItem('myPapalyData_v19');
-                    if (!saved) saved = localStorage.getItem('myPapalyData_v18');
-                    if (!saved) saved = localStorage.getItem('myPapalyData_v16');
-                    if (saved) { try { const p = JSON.parse(saved); boards.value = p.boards || []; activeBoardId.value = p.activeBoardId; themeColor.value = p.themeColor || 'blue'; } catch (e) { } }
-                    
-                    boards.value.forEach(b => {
+                const migrateBoardsFormat = (boardsData) => {
+                    boardsData.forEach(b => {
                         if(b.columns) {
                             b.columns.forEach(col => {
                                 if(col.categories) {
@@ -686,7 +682,13 @@
                             });
                         }
                     });
-                    
+                };
+                const loadLocalData = () => {
+                    let saved = localStorage.getItem('myPapalyData_v19');
+                    if (!saved) saved = localStorage.getItem('myPapalyData_v18');
+                    if (!saved) saved = localStorage.getItem('myPapalyData_v16');
+                    if (saved) { try { const p = JSON.parse(saved); boards.value = p.boards || []; activeBoardId.value = p.activeBoardId; themeColor.value = p.themeColor || 'blue'; } catch (e) { } }
+                    migrateBoardsFormat(boards.value);
                     if (boards.value.length === 0) initDefaultData();
                 };
                 const initDefaultData = () => { const def = { id: Date.now(), title: 'Home', icon: 'fas fa-bookmark', columns: [{ id: 'c1', width: 280, categories: [{ id: 'cat1', title: 'Example', subcategories: [{ id: 'sub1', title: null, bookmarks: [{ id: 'b1', title: 'Google', url: 'https://google.com', type: 'link', icon: 'https://www.google.com/s2/favicons?domain=google.com' }] }] }] }] }; boards.value = [def]; activeBoardId.value = def.id; };
