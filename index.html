@@ -44,6 +44,17 @@
             border: 2px dashed #94a3b8;
         }
 
+        .sortable-chosen {
+            transform: scale(0.98);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        .category-placeholder {
+            border: 2px dashed #94a3b8 !important;
+            background: rgba(59,130,246,0.03) !important;
+            min-height: 48px;
+        }
+
         .resize-handle {
             cursor: col-resize;
             width: 14px;
@@ -275,7 +286,7 @@
 </head>
 
 <body id="app" class="h-screen w-screen overflow-hidden bg-cover bg-center"
-    :style="{ backgroundImage: `url(${backgroundImage})` }">
+    :style="{ backgroundImage: `url('${backgroundImage}')` }">
 
     <div class="flex h-full w-full bg-gray-100/80 backdrop-blur-sm" :class="`theme-${themeColor}`">
 
@@ -362,8 +373,7 @@
                                 <div
                                     class="px-2 py-1.5 flex justify-between items-center border-b border-gray-300 group bg-gray-100">
                                     <div class="flex items-center flex-1 overflow-hidden">
-                                        <div class="mr-2 cursor-move text-gray-400 hover:text-blue-600" draggable="true"
-                                            @dragstart="onCategoryDragStart(column.id, category, $event)"><i
+                                        <div class="mr-2 cursor-move text-gray-400 hover:text-blue-600 category-drag-handle"><i
                                                 class="fas fa-arrows-alt text-xs"></i></div>
                                         <input v-model="category.title" @change="saveData"
                                             class="bg-transparent font-bold text-sm text-gray-900 focus:outline-none w-full cursor-text hover:text-blue-700">
@@ -426,6 +436,10 @@
                                             </div>
                                         </div>
                                     </template>
+                                </div>
+                                <div class="px-2 pb-2">
+                                    <button @click="addBookmark(category.id)" title="Add a new bookmark to this category" aria-label="New Bookmark"
+                                        class="w-full py-1 border-2 border-dashed border-gray-300 rounded text-xs text-gray-400 hover:bg-white hover:text-blue-600 font-bold bg-white">+ New Bookmark</button>
                                 </div>
                             </div>
                             <button @click="createCategory(column.id)" title="Create a new Category in this column" aria-label="New Category"
@@ -729,7 +743,7 @@
                 };
 
                 // --- Standard Logic ---
-                const onCategoryDragStart = (colId, category, event) => { draggingCategoryInfo.value = { columnId: colId, category: category }; };
+                
                 const onDragOverCollection = (boardId) => { if (draggingCategoryInfo.value && boardId !== activeBoardId.value) dragTargetBoardId.value = boardId; };
                 const onDragLeaveCollection = (boardId) => { if (dragTargetBoardId.value === boardId) dragTargetBoardId.value = null; };
                 const onDropToCollection = (targetBoardId) => {
@@ -766,7 +780,7 @@
                     nextTick(() => {
                         const colContainer = document.getElementById('columns-container');
                         if (colContainer) { new Sortable(colContainer, { animation: 150, handle: '.column-drag-handle', draggable: '.column-wrapper', onEnd: (evt) => { const item = activeBoard.value.columns.splice(evt.oldIndex, 1)[0]; activeBoard.value.columns.splice(evt.newIndex, 0, item); saveData(); } }); }
-                        document.querySelectorAll('.category-sortable-area').forEach(el => { new Sortable(el, { group: 'shared-categories', animation: 150, handle: '.category-drag-handle', draggable: '.category-card', ghostClass: 'sortable-ghost', onEnd: (evt) => { const fromCol = activeBoard.value.columns.find(c => c.id == evt.from.dataset.colId); const toCol = activeBoard.value.columns.find(c => c.id == evt.to.dataset.colId); if (fromCol && toCol) { const item = fromCol.categories.splice(evt.oldIndex, 1)[0]; toCol.categories.splice(evt.newIndex, 0, item); saveData(); } } }); });
+                        document.querySelectorAll('.category-sortable-area').forEach(el => { new Sortable(el, { group: 'shared-categories', animation: 150, handle: '.category-drag-handle', draggable: '.category-card', ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen', fallbackOnBody: true, onStart: (evt) => { try { const fromColId = evt.from.dataset.colId; const fromCol = activeBoard.value.columns.find(c => c.id == fromColId); if (fromCol) { draggingCategoryInfo.value = { columnId: fromColId, category: fromCol.categories[evt.oldIndex] }; } } catch (e) { draggingCategoryInfo.value = null; } }, onEnd: (evt) => { const fromCol = activeBoard.value.columns.find(c => c.id == evt.from.dataset.colId); const toCol = activeBoard.value.columns.find(c => c.id == evt.to.dataset.colId); if (fromCol && toCol) { const item = fromCol.categories.splice(evt.oldIndex, 1)[0]; toCol.categories.splice(evt.newIndex, 0, item); saveData(); } draggingCategoryInfo.value = null; mergeTargetCatId.value = null; } }); });
                         document.querySelectorAll('.bookmark-list').forEach(el => { new Sortable(el, { group: 'shared-bookmarks', animation: 100, ghostClass: 'sortable-ghost', onEnd: (evt) => { let fromCat, toCat; for (const col of activeBoard.value.columns) { if (!fromCat) fromCat = col.categories.find(c => c.id == evt.from.dataset.catId); if (!toCat) toCat = col.categories.find(c => c.id == evt.to.dataset.catId); } if (fromCat && toCat) { const item = fromCat.bookmarks.splice(evt.oldIndex, 1)[0]; toCat.bookmarks.splice(evt.newIndex, 0, item); saveData(); } } }); });
                     });
                 };
@@ -833,7 +847,7 @@
                     boards, activeBoardId, activeBoard, backgroundImage, searchQuery, modal, showSettings, modalTitle: computed(() => { if (modal.value.isBoard) return 'New Collection'; if (modal.value.isDivider) return 'Add Divider'; return modal.value.isEdit ? 'Edit' : 'Add'; }),
                     modalInput, user, syncStatus,
                     saveData, openCreateBoardModal, deleteBoard, createColumn, deleteColumn, createCategory, deleteCategory, addBookmark, addSubCategory, editBookmark, deleteBookmark, saveModal, handleEnterKey, getModalIcon, getFavicon, handleImgError, openUrl, setRandomBg, startResize, switchBoard, filterCategories, boardContainer: ref(null), resetData,
-                    onCategoryDragStart, onDragOverCollection, onDragLeaveCollection, onDropToCollection, dragTargetBoardId, onMergeDragOver, onMergeDragLeave, onMergeDrop, mergeTargetCatId,
+                    onDragOverCollection, onDragLeaveCollection, onDropToCollection, dragTargetBoardId, onMergeDragOver, onMergeDragLeave, onMergeDrop, mergeTargetCatId,
                     login, logout, exportHtml, importHtml, moveCategoryToCollection, sidebarOpen, themeColor
                 };
             }
