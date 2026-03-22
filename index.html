@@ -122,13 +122,11 @@
         <aside class="flex flex-col flex-shrink-0 h-full bg-white border-r border-gray-300 z-30 shadow-lg"
             style="min-width: max-content;">
             <div class="h-14 flex flex-col justify-center px-4 border-b border-gray-200 shrink-0 bg-gray-50">
-                <div class="flex items-center font-bold text-gray-800"><i class="fas fa-cloud text-blue-600 mr-2"></i>
-                    Papaly V19</div>
+                <div class="flex items-center justify-center font-bold text-gray-800">
+                    <img src="image/icon.jpeg" class="w-12 h-12" alt="Custom Icon">
+                </div>
                 <div v-if="user" class="text-[10px] text-green-600 mt-1 truncate w-32 flex items-center">
                     <img :src="user.photoURL" class="w-3 h-3 rounded-full mr-1"> {{ user.displayName }}
-                </div>
-                <div v-else class="text-[10px] text-gray-400 mt-1 cursor-pointer hover:text-blue-600" @click="login">
-                    <i class="fas fa-sign-in-alt mr-1"></i> 未登录 (仅本地)
                 </div>
             </div>
 
@@ -151,8 +149,9 @@
             <div class="p-3 border-t border-gray-300 shrink-0 bg-gray-50">
                 <button @click="openCreateBoardModal"
                     class="flex items-center w-full py-2 px-3 bg-white border border-gray-300 rounded shadow-sm hover:border-blue-500 hover:text-blue-700 mb-3 text-gray-700 font-bold text-xs"><i
-                        class="fas fa-plus w-5 text-center"></i><span>新建画板</span></button>
-                <div class="flex justify-center items-center text-xs text-gray-500 font-medium cursor-pointer hover:text-blue-600"
+                        class="fas fa-plus w-5 text-center"></i><span>新建画板</span></button>                <div v-if="!user" class="flex justify-center items-center text-xs text-gray-400 cursor-pointer hover:text-blue-600 mb-2" @click="login">
+                    <i class="fas fa-sign-in-alt mr-1"></i> 未登录 (仅本地)
+                </div>                <div class="flex justify-center items-center text-xs text-gray-500 font-medium cursor-pointer hover:text-blue-600"
                     @click.stop="showSettings = true"><i class="fas fa-cog mr-1.5"></i> <span>设置 / 备份</span></div>
             </div>
         </aside>
