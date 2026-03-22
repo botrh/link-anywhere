@@ -25,8 +25,8 @@
 
         .card-panel {
             background: #ffffff;
-            border: 1px solid #cbd5e1;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .no-scrollbar::-webkit-scrollbar {
@@ -58,7 +58,7 @@
             background: rgba(59, 130, 246, 0.2);
         }
 
-        .drag-over-board {
+        .drag-over-collection {
             background-color: #dbeafe !important;
             border-left: 4px solid #2563eb !important;
         }
@@ -80,19 +80,32 @@
             text-orientation: mixed;
         }
 
-        .sync-status {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 100;
-            font-size: 12px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-            opacity: 0;
-            pointer-events: none;
+        .sidebar-hidden {
+            display: none;
+        }
+
+        @media (min-width: 769px) {
+            .sidebar-hidden {
+                display: flex !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            aside {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 40;
+                transition: transform 0.3s;
+                width: 280px !important;
+            }
+            aside.sidebar-hidden {
+                transform: translateX(-100%);
+            }
+            main {
+                margin-left: 0;
+            }
         }
 
         .sync-status.show {
@@ -110,17 +123,165 @@
         .sync-error {
             color: #dc2626;
         }
+
+        /* Theme Colors */
+        /* ===== Blue Theme ===== */
+        .theme-blue .bg-blue-50 { background-color: #eff6ff; }
+        .theme-blue .text-blue-600 { color: #2563eb; }
+        .theme-blue .border-blue-300 { border-color: #93c5fd; }
+        .theme-blue .text-blue-800 { color: #1e40af; }
+        .theme-blue .border-blue-600 { border-color: #2563eb; }
+        .theme-blue .text-blue-700 { color: #1d4ed8; }
+        .theme-blue .hover\:border-blue-500:hover { border-color: #3b82f6; }
+        .theme-blue .hover\:text-blue-700:hover { color: #1d4ed8; }
+        .theme-blue .focus\:border-blue-500:focus { border-color: #3b82f6; }
+        .theme-blue .focus\:ring-blue-500:focus { --tw-ring-color: #3b82f6; }
+        .theme-blue .hover\:bg-blue-50:hover { background-color: #eff6ff; }
+        .theme-blue .hover\:border-blue-300:hover { border-color: #93c5fd; }
+        .theme-blue .group-hover\:text-blue-700:hover { color: #1d4ed8; }
+        .theme-blue .group:hover .group-hover\:text-blue-700 { color: #1d4ed8; }
+        .theme-blue .hover\:text-blue-600:hover { color: #2563eb; }
+
+        /* ===== 绿色主题 ===== */
+        .theme-green .bg-blue-50 { background-color: #f0fdf4; }
+        .theme-green .text-blue-600 { color: #16a34a; }
+        .theme-green .border-blue-300 { border-color: #86efac; }
+        .theme-green .text-blue-800 { color: #166534; }
+        .theme-green .border-blue-600 { border-color: #16a34a; }
+        .theme-green .text-blue-700 { color: #15803d; }
+        .theme-green .hover\:border-blue-500:hover { border-color: #22c55e; }
+        .theme-green .hover\:text-blue-700:hover { color: #15803d; }
+        .theme-green .focus\:border-blue-500:focus { border-color: #22c55e; }
+        .theme-green .focus\:ring-blue-500:focus { --tw-ring-color: #22c55e; }
+        .theme-green .hover\:bg-blue-50:hover { background-color: #f0fdf4; }
+        .theme-green .hover\:border-blue-300:hover { border-color: #86efac; }
+        .theme-green .group-hover\:text-blue-700:hover { color: #15803d; }
+        .theme-green .group:hover .group-hover\:text-blue-700 { color: #15803d; }
+        .theme-green .hover\:text-blue-600:hover { color: #16a34a; }
+
+        /* ===== 紫色主题 ===== */
+        .theme-purple .bg-blue-50 { background-color: #faf5ff; }
+        .theme-purple .text-blue-600 { color: #9333ea; }
+        .theme-purple .border-blue-300 { border-color: #c4b5fd; }
+        .theme-purple .text-blue-800 { color: #6b21a8; }
+        .theme-purple .border-blue-600 { border-color: #9333ea; }
+        .theme-purple .text-blue-700 { color: #7c3aed; }
+        .theme-purple .hover\:border-blue-500:hover { border-color: #a855f7; }
+        .theme-purple .hover\:text-blue-700:hover { color: #7c3aed; }
+        .theme-purple .focus\:border-blue-500:focus { border-color: #a855f7; }
+        .theme-purple .focus\:ring-blue-500:focus { --tw-ring-color: #a855f7; }
+        .theme-purple .hover\:bg-blue-50:hover { background-color: #faf5ff; }
+        .theme-purple .hover\:border-blue-300:hover { border-color: #c4b5fd; }
+        .theme-purple .group-hover\:text-blue-700:hover { color: #7c3aed; }
+        .theme-purple .group:hover .group-hover\:text-blue-700 { color: #7c3aed; }
+        .theme-purple .hover\:text-blue-600:hover { color: #9333ea; }
+
+        /* ===== 红色主题 ===== */
+        .theme-red .bg-blue-50 { background-color: #fef2f2; }
+        .theme-red .text-blue-600 { color: #dc2626; }
+        .theme-red .border-blue-300 { border-color: #fca5a5; }
+        .theme-red .text-blue-800 { color: #991b1b; }
+        .theme-red .border-blue-600 { border-color: #dc2626; }
+        .theme-red .text-blue-700 { color: #b91c1c; }
+        .theme-red .hover\:border-blue-500:hover { border-color: #ef4444; }
+        .theme-red .hover\:text-blue-700:hover { color: #b91c1c; }
+        .theme-red .focus\:border-blue-500:focus { border-color: #ef4444; }
+        .theme-red .focus\:ring-blue-500:focus { --tw-ring-color: #ef4444; }
+        .theme-red .hover\:bg-blue-50:hover { background-color: #fef2f2; }
+        .theme-red .hover\:border-blue-300:hover { border-color: #fca5a5; }
+        .theme-red .group-hover\:text-blue-700:hover { color: #b91c1c; }
+        .theme-red .group:hover .group-hover\:text-blue-700 { color: #b91c1c; }
+        .theme-red .hover\:text-blue-600:hover { color: #dc2626; }
+
+        /* ===== 灰色主题 ===== */
+        .theme-gray .bg-blue-50 { background-color: #f9fafb; }
+        .theme-gray .text-blue-600 { color: #4b5563; }
+        .theme-gray .border-blue-300 { border-color: #d1d5db; }
+        .theme-gray .text-blue-800 { color: #374151; }
+        .theme-gray .border-blue-600 { border-color: #4b5563; }
+        .theme-gray .text-blue-700 { color: #374151; }
+        .theme-gray .hover\:border-blue-500:hover { border-color: #6b7280; }
+        .theme-gray .hover\:text-blue-700:hover { color: #374151; }
+        .theme-gray .focus\:border-blue-500:focus { border-color: #6b7280; }
+        .theme-gray .focus\:ring-blue-500:focus { --tw-ring-color: #6b7280; }
+        .theme-gray .hover\:bg-blue-50:hover { background-color: #f9fafb; }
+        .theme-gray .hover\:border-blue-300:hover { border-color: #d1d5db; }
+        .theme-gray .group-hover\:text-blue-700:hover { color: #374151; }
+        .theme-gray .group:hover .group-hover\:text-blue-700 { color: #374151; }
+        .theme-gray .hover\:text-blue-600:hover { color: #4b5563; }
+
+        /* ===== 额外样式补全 ===== */
+        .theme-blue .focus\:border-blue-600:focus { border-color: #2563eb; }
+        .theme-blue .hover\:border-blue-500:hover { border-color: #3b82f6; }
+        .theme-blue .hover\:text-blue-600:hover { color: #2563eb; }
+
+        .theme-green .focus\:border-blue-600:focus { border-color: #16a34a; }
+        .theme-green .hover\:border-blue-500:hover { border-color: #22c55e; }
+        .theme-green .hover\:text-blue-600:hover { color: #16a34a; }
+
+        .theme-purple .focus\:border-blue-600:focus { border-color: #9333ea; }
+        .theme-purple .hover\:border-blue-500:hover { border-color: #a855f7; }
+        .theme-purple .hover\:text-blue-600:hover { color: #9333ea; }
+
+        .theme-red .focus\:border-blue-600:focus { border-color: #dc2626; }
+        .theme-red .hover\:border-blue-500:hover { border-color: #ef4444; }
+        .theme-red .hover\:text-blue-600:hover { color: #dc2626; }
+
+        .theme-gray .focus\:border-blue-600:focus { border-color: #4b5563; }
+        .theme-gray .hover\:border-blue-500:hover { border-color: #6b7280; }
+        .theme-gray .hover\:text-blue-600:hover { color: #4b5563; }
+
+        /* ===== 按钮背景色适配 ===== */
+        .theme-blue .bg-blue-600 { background-color: #2563eb; }
+        .theme-blue .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
+        .theme-blue .focus\:bg-blue-600:focus { background-color: #2563eb; }
+
+        .theme-green .bg-blue-600 { background-color: #16a34a; }
+        .theme-green .hover\:bg-blue-700:hover { background-color: #15803d; }
+        .theme-green .focus\:bg-blue-600:focus { background-color: #16a34a; }
+
+        .theme-purple .bg-blue-600 { background-color: #9333ea; }
+        .theme-purple .hover\:bg-blue-700:hover { background-color: #7c3aed; }
+        .theme-purple .focus\:bg-blue-600:focus { background-color: #9333ea; }
+
+        .theme-red .bg-blue-600 { background-color: #dc2626; }
+        .theme-red .hover\:bg-blue-700:hover { background-color: #b91c1c; }
+        .theme-red .focus\:bg-blue-600:focus { background-color: #dc2626; }
+
+        .theme-gray .bg-blue-600 { background-color: #4b5563; }
+        .theme-gray .hover\:bg-blue-700:hover { background-color: #374151; }
+        .theme-gray .focus\:bg-blue-600:focus { background-color: #4b5563; }
+
+        /* ===== 按钮环形焦点适配 ===== */
+        .theme-blue .focus\:ring-blue-600:focus { --tw-ring-color: #2563eb; }
+        .theme-green .focus\:ring-blue-600:focus { --tw-ring-color: #16a34a; }
+        .theme-purple .focus\:ring-blue-600:focus { --tw-ring-color: #9333ea; }
+        .theme-red .focus\:ring-blue-600:focus { --tw-ring-color: #dc2626; }
+        .theme-gray .focus\:ring-blue-600:focus { --tw-ring-color: #4b5563; }
+
+        /* ===== 其他蓝色相关样式 ===== */
+        .theme-blue .bg-blue-50 { background-color: #eff6ff; }
+        .theme-green .bg-blue-50 { background-color: #f0fdf4; }
+        .theme-purple .bg-blue-50 { background-color: #faf5ff; }
+        .theme-red .bg-blue-50 { background-color: #fef2f2; }
+        .theme-gray .bg-blue-50 { background-color: #f9fafb; }
+
+        .theme-blue .group:hover .group-hover\:opacity-100 { opacity: 1; }
+        .theme-green .group:hover .group-hover\:opacity-100 { opacity: 1; }
+        .theme-purple .group:hover .group-hover\:opacity-100 { opacity: 1; }
+        .theme-red .group:hover .group-hover\:opacity-100 { opacity: 1; }
+        .theme-gray .group:hover .group-hover\:opacity-100 { opacity: 1; }
     </style>
 </head>
 
 <body id="app" class="h-screen w-screen overflow-hidden bg-cover bg-center"
     :style="{ backgroundImage: `url(${backgroundImage})` }">
 
-    <div class="flex h-full w-full bg-gray-100/80 backdrop-blur-sm">
+    <div class="flex h-full w-full bg-gray-100/80 backdrop-blur-sm" :class="`theme-${themeColor}`">
 
         <!-- 左侧 -->
         <aside class="flex flex-col flex-shrink-0 h-full bg-white border-r border-gray-300 z-30 shadow-lg"
-            style="min-width: max-content;">
+            :class="{ 'sidebar-hidden': !sidebarOpen }" style="min-width: max-content;">
             <div class="h-14 flex flex-col justify-center px-4 border-b border-gray-200 shrink-0 bg-gray-50">
                 <div class="flex items-center justify-center font-bold text-gray-800">
                     <img src="image/icon.jpeg" class="w-12 h-12" alt="Custom Icon">
@@ -132,13 +293,13 @@
 
             <div class="flex-1 overflow-y-auto no-scrollbar py-2 space-y-1 px-2">
                 <div v-for="board in boards" :key="board.id" @click="switchBoard(board.id)"
-                    @dragover.prevent="onDragOverBoard(board.id)" @dragleave="onDragLeaveBoard(board.id)"
-                    @drop="onDropToBoard(board.id)"
+                    @dragover.prevent="onDragOverCollection(board.id)" @dragleave="onDragLeaveCollection(board.id)"
+                    @drop="onDropToCollection(board.id)"
                     class="group flex items-center justify-between px-3 py-2.5 rounded border cursor-pointer transition-colors whitespace-nowrap relative"
-                    :class="[activeBoardId === board.id ? 'bg-blue-50 text-blue-800 border-blue-300 font-bold' : 'bg-white border-transparent hover:bg-gray-100 text-gray-700', dragTargetBoardId === board.id ? 'drag-over-board' : '']">
-                    <div class="flex items-center pointer-events-none">
-                        <div class="w-5 text-center shrink-0"><i :class="board.icon || 'fas fa-columns'"
-                                class="text-sm"></i></div>
+                    :class="[activeBoardId === board.id ? 'bg-blue-50 text-blue-800 border-blue-300 font-bold' : 'bg-white border-transparent hover:bg-gray-100 text-gray-700', dragTargetBoardId === board.id ? 'drag-over-collection' : '']">
+                    <div class="flex items-center">
+                        <div class="w-6 text-center shrink-0 flex items-center justify-center"><i :class="board.icon || 'fas fa-bookmark'"
+                                class="text-base"></i></div>
                         <span class="ml-2 text-sm select-none">{{ board.title }}</span>
                     </div>
                     <i v-if="boards.length > 1" @click.stop="deleteBoard(board.id)"
@@ -149,10 +310,12 @@
             <div class="p-3 border-t border-gray-300 shrink-0 bg-gray-50">
                 <button @click="openCreateBoardModal"
                     class="flex items-center w-full py-2 px-3 bg-white border border-gray-300 rounded shadow-sm hover:border-blue-500 hover:text-blue-700 mb-3 text-gray-700 font-bold text-xs"><i
-                        class="fas fa-plus w-5 text-center"></i><span>新建画板</span></button>                <div v-if="!user" class="flex justify-center items-center text-xs text-gray-400 cursor-pointer hover:text-blue-600 mb-2" @click="login">
-                    <i class="fas fa-sign-in-alt mr-1"></i> 未登录 (仅本地)
-                </div>                <div class="flex justify-center items-center text-xs text-gray-500 font-medium cursor-pointer hover:text-blue-600"
-                    @click.stop="showSettings = true"><i class="fas fa-cog mr-1.5"></i> <span>设置 / 备份</span></div>
+                        class="fas fa-plus w-5 text-center"></i><span>New Collection</span></button>
+                <div v-if="!user" class="flex items-center text-xs text-gray-400 cursor-pointer hover:text-blue-600 mb-2" @click="login">
+                    <i class="fas fa-sign-in-alt mr-1 w-4 text-center"></i> Not Logged In (Local Only)
+                </div>
+                <div class="flex items-center text-xs text-gray-500 font-medium cursor-pointer hover:text-blue-600"
+                    @click.stop="showSettings = true"><i class="fas fa-cog mr-1.5 w-4 text-center"></i> <span>Settings / Backup</span></div>
             </div>
         </aside>
 
@@ -161,11 +324,14 @@
             <header
                 class="h-12 flex items-center justify-between px-6 z-10 shrink-0 bg-white border-b border-gray-300 shadow-sm">
                 <div class="flex items-center gap-3 group">
+                    <button @click="sidebarOpen = !sidebarOpen" class="hidden sm:block md:hidden mr-2 p-1 rounded hover:bg-gray-100">
+                        <i class="fas fa-bars text-gray-600"></i>
+                    </button>
                     <input v-if="activeBoard" v-model="activeBoard.title" @change="saveData"
                         class="text-lg font-black bg-transparent border-b-2 border-transparent focus:border-blue-600 focus:outline-none w-64 text-gray-900 placeholder-gray-400 hover:border-gray-300">
                 </div>
                 <div class="relative group">
-                    <input type="text" v-model="searchQuery" placeholder="搜索..."
+                    <input type="text" v-model="searchQuery" placeholder="Search..."
                         class="pl-8 pr-4 py-1.5 rounded-full border border-gray-300 bg-gray-50 text-sm w-48 focus:w-64 transition-all focus:outline-none focus:border-blue-500 focus:ring-1 text-gray-800">
                     <i class="fas fa-search absolute left-3 top-2 text-xs text-gray-500"></i>
                 </div>
@@ -212,17 +378,17 @@
                                                 class="absolute right-0 top-6 w-32 bg-white shadow-xl rounded border border-gray-300 hidden group-hover/menu:block z-50">
                                                 <div @click="addBookmark(category.id)"
                                                     class="px-3 py-2 hover:bg-blue-50 cursor-pointer text-xs text-gray-700">
-                                                    <i class="fas fa-plus w-4 text-blue-500"></i> 添加书签</div>
+                                                    <i class="fas fa-plus w-4 text-blue-500"></i> Add Bookmark</div>
                                                 <div @click="addSubCategory(category.id)"
                                                     class="px-3 py-2 hover:bg-blue-50 cursor-pointer text-xs text-gray-700">
-                                                    <i class="fas fa-minus w-4 text-gray-500"></i> 添加分割线</div>
+                                                    <i class="fas fa-minus w-4 text-gray-500"></i> Add Divider</div>
                                                 <div
                                                     class="px-3 py-2 hover:bg-yellow-50 cursor-pointer text-xs text-gray-700 flex items-center relative group/submenu">
-                                                    <i class="fas fa-share-square w-4 text-yellow-500"></i> 移动到...<div
+                                                    <i class="fas fa-share-square w-4 text-yellow-500"></i> Move to...<div
                                                         class="absolute left-full top-0 w-32 bg-white shadow-xl rounded border border-gray-300 hidden group-hover/submenu:block ml-1 max-h-48 overflow-y-auto">
                                                         <div v-for="b in boards" :key="b.id"
                                                             v-show="b.id !== activeBoardId"
-                                                            @click.stop="moveCategoryToBoard(column.id, category, b.id)"
+                                                            @click.stop="moveCategoryToCollection(column.id, category, b.id)"
                                                             class="px-3 py-2 hover:bg-gray-100 truncate">{{ b.title }}
                                                         </div>
                                                     </div>
@@ -248,6 +414,8 @@
                                                 <div
                                                     class="truncate compact-text text-gray-700 group-hover:text-blue-700">
                                                     {{ bookmark.title }}</div>
+                                                <div v-if="bookmark.note" class="truncate compact-text text-gray-500 text-xs mt-0.5">
+                                                    {{ bookmark.note }}</div>
                                             </div>
                                             <div
                                                 class="absolute right-1 flex opacity-0 group-hover:opacity-100 bg-white rounded shadow-sm border border-gray-300">
@@ -261,7 +429,7 @@
                                 </div>
                             </div>
                             <button @click="createCategory(column.id)"
-                                class="w-full py-1 border-2 border-dashed border-gray-300 rounded text-xs text-gray-400 hover:bg-white hover:text-blue-600 font-bold bg-gray-50">+</button>
+                                class="w-full py-1 border-2 border-dashed border-gray-300 rounded text-xs text-gray-400 hover:bg-white hover:text-blue-600 font-bold bg-gray-50">+ New</button>
                         </div>
                         <div class="resize-handle" @mousedown="startResize($event, column)"></div>
                     </div>
@@ -269,7 +437,7 @@
                         <button @click="createColumn"
                             class="w-full h-48 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center flex-col gap-2 transition-all hover:bg-white hover:border-blue-500 text-gray-500 hover:text-blue-600 bg-gray-100"><i
                                 class="fas fa-plus text-lg"></i><span
-                                class="text-xs vertical-text font-black tracking-widest">NEW COL</span></button>
+                                class="text-xs vertical-text font-black tracking-widest">New Column</span></button>
                     </div>
                 </div>
             </div>
@@ -277,10 +445,10 @@
 
         <div class="sync-status" :class="{'show': syncStatus.show}">
             <span v-if="syncStatus.state === 'saving'" class="sync-saving"><i class="fas fa-sync fa-spin mr-1"></i>
-                正在同步...</span>
-            <span v-if="syncStatus.state === 'saved'" class="sync-saved"><i class="fas fa-check mr-1"></i> 云端已同步</span>
+                Syncing...</span>
+            <span v-if="syncStatus.state === 'saved'" class="sync-saved"><i class="fas fa-check mr-1"></i> Synced</span>
             <span v-if="syncStatus.state === 'error'" class="sync-error"><i
-                    class="fas fa-exclamation-triangle mr-1"></i> 同步失败 (检查网络/登录)</span>
+                    class="fas fa-exclamation-triangle mr-1"></i> Sync Failed (Check Network/Login)</span>
         </div>
     </div>
 
@@ -290,14 +458,16 @@
         <div class="bg-white rounded-lg w-96 shadow-xl p-6">
             <h3 class="font-bold mb-4">{{ modalTitle }}</h3>
             <input v-model="modal.data.title" @keyup.enter="handleEnterKey" ref="modalInput"
-                class="w-full p-2 border rounded mb-3" placeholder="名称">
+                class="w-full p-2 border rounded mb-3" placeholder="Name">
             <input v-if="!modal.isBoard && !modal.isDivider" v-model="modal.data.url" @keyup.enter="saveModal"
-                class="w-full p-2 border rounded mb-2" placeholder="URL">
+                class="w-full p-2 border rounded mb-2" placeholder="URL (e.g., example.com)">
+            <textarea v-if="!modal.isBoard && !modal.isDivider" v-model="modal.data.note" rows="3"
+                class="w-full p-2 border rounded mb-4" placeholder="Notes (Optional)"></textarea>
             <input v-if="!modal.isBoard && !modal.isDivider" v-model="modal.data.icon" @keyup.enter="saveModal"
-                class="w-full p-2 border rounded mb-4" placeholder="自定义图标 URL（可选）">
+                class="w-full p-2 border rounded mb-4" placeholder="Custom Icon URL (Optional)">
             <div class="flex justify-end gap-2"><button @click="modal.show=false"
-                    class="px-3 py-1 bg-gray-200 rounded">取消</button><button @click="saveModal"
-                    class="px-3 py-1 bg-blue-600 text-white rounded">保存</button></div>
+                    class="px-3 py-1 bg-gray-200 rounded">Cancel</button><button @click="saveModal"
+                    class="px-3 py-1 bg-blue-600 text-white rounded">Save</button></div>
         </div>
     </div>
 
@@ -306,58 +476,66 @@
         @click.self="showSettings = false">
         <div class="bg-white rounded-lg w-[450px] shadow-xl p-6 overflow-y-auto max-h-[85vh]">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h3 class="font-bold text-gray-800">设置</h3>
+                <h3 class="font-bold text-gray-800">Settings</h3>
                 <i class="fas fa-times cursor-pointer text-gray-400 hover:text-black" @click="showSettings = false"></i>
             </div>
 
-            <!-- 1. 云端账户 -->
+            <!-- 1. Cloud Sync -->
             <div class="mb-5">
-                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">云端同步 (Google Firebase)</label>
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Cloud Sync (Google Firebase)</label>
                 <div v-if="!user" class="text-center bg-gray-50 p-3 rounded">
-                    <p class="text-xs text-gray-500 mb-2">登录后可在不同电脑/手机间自动同步</p>
+                    <p class="text-xs text-gray-500 mb-2">Sign in to sync across devices</p>
                     <button @click="login"
                         class="w-full py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 flex items-center justify-center gap-2"><i
-                            class="fab fa-google"></i> Google 登录</button>
+                            class="fab fa-google"></i> Sign In with Google</button>
                 </div>
                 <div v-else class="text-center bg-green-50 p-3 rounded border border-green-200">
                     <p class="text-xs text-green-700 mb-2 font-bold flex items-center justify-center"><i
-                            class="fas fa-user-check mr-1"></i> 已登录: {{ user.email }}</p>
+                            class="fas fa-user-check mr-1"></i> Signed In: {{ user.email }}</p>
                     <button @click="logout"
-                        class="px-4 py-1 bg-white text-red-500 border border-red-200 rounded text-xs hover:bg-red-50">退出登录</button>
+                        class="px-4 py-1 bg-white text-red-500 border border-red-200 rounded text-xs hover:bg-red-50">Sign Out</button>
                 </div>
             </div>
 
-            <!-- 2. 本地数据导入导出 (回归功能) -->
+            <!-- 2. Data Backup & Migration -->
             <div class="mb-5 pt-4 border-t border-gray-100">
-                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">数据备份与迁移 (HTML)</label>
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Backup & Migration (HTML)</label>
                 <div class="flex gap-2">
                     <button @click="exportHtml"
                         class="flex-1 py-2 rounded text-xs text-white bg-green-600 hover:bg-green-700 shadow-sm font-bold flex items-center justify-center">
-                        <i class="fas fa-download mr-1"></i> 导出 HTML
+                        <i class="fas fa-download mr-1"></i> Export HTML
                     </button>
                     <div class="flex-1 relative">
                         <button
                             class="w-full py-2 rounded text-xs text-white bg-gray-600 hover:bg-gray-700 shadow-sm font-bold flex items-center justify-center">
-                            <i class="fas fa-upload mr-1"></i> 导入 HTML
+                            <i class="fas fa-upload mr-1"></i> Import HTML
                         </button>
                         <input type="file" @change="importHtml" class="absolute inset-0 opacity-0 cursor-pointer"
                             accept=".html,.htm">
                     </div>
                 </div>
-                <p class="text-[10px] text-gray-400 mt-1">* 支持 Netscape 标准格式 (Chrome/Edge/Papaly)</p>
+                <p class="text-[10px] text-gray-400 mt-1">* Supports Netscape format (Chrome/Edge/Papaly)</p>
             </div>
 
-            <!-- 3. 常规 -->
+            <!-- 3. Appearance -->
             <div class="mb-4 pt-4 border-t border-gray-100">
-                <label class="text-xs font-bold text-gray-500">背景图片</label>
+                <label class="text-xs font-bold text-gray-500">Background Image</label>
                 <div class="flex gap-2 mt-1"><input v-model="backgroundImage" @change="saveData"
                         class="flex-1 p-1.5 border rounded text-xs"><button @click="setRandomBg"
-                        class="px-3 bg-gray-200 rounded text-xs hover:bg-gray-300">随机</button></div>
-            </div>
+                        class="px-3 bg-gray-200 rounded text-xs hover:bg-gray-300">Random</button></div>                <div class="mt-3">
+                    <label class="text-xs font-bold text-gray-500">Theme Color</label>
+                    <select v-model="themeColor" @change="saveData" class="w-full p-1.5 border rounded text-xs mt-1">
+                        <option value="blue">Blue</option>
+                        <option value="green">Green</option>
+                        <option value="purple">Purple</option>
+                        <option value="red">Red</option>
+                        <option value="gray">Gray</option>
+                    </select>
+                </div>            </div>
 
             <div class="pt-4 border-t border-gray-100 text-center">
                 <button @click="resetData" class="text-xs text-red-400 hover:text-red-600 hover:underline">⚠️
-                    清空重置所有数据</button>
+                    Reset All Data</button>
             </div>
         </div>
     </div>
@@ -383,7 +561,7 @@
                 auth = firebase.auth();
                 db = firebase.firestore();
             } else {
-                console.warn("Firebase 未配置，云同步功能不可用。请编辑 HTML 文件填入配置。");
+                console.warn("Firebase not configured. Cloud sync unavailable. Please edit HTML to add config.");
             }
         } catch (e) { console.error("Firebase Init Error", e); }
 
@@ -396,6 +574,7 @@
                 const backgroundImage = ref('https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop');
                 const user = ref(null);
                 const syncStatus = ref({ show: false, state: '' });
+                const themeColor = ref('blue');
 
                 const searchQuery = ref('');
                 const showSettings = ref(false);
@@ -404,6 +583,7 @@
                 const dragTargetBoardId = ref(null);
                 const mergeTargetCatId = ref(null);
                 const draggingCategoryInfo = ref(null);
+                const sidebarOpen = ref(true);
 
                 const activeBoard = computed(() => activeBoardId.value ? (boards.value.find(b => b.id === activeBoardId.value) || null) : null);
                 const filterCategories = (categories) => {
@@ -419,7 +599,7 @@
 
                 // --- 认证与同步 ---
                 const login = () => { if (auth) { const p = new firebase.auth.GoogleAuthProvider(); auth.signInWithPopup(p).catch(alert); } else { alert("请先配置代码中的 firebaseConfig"); } };
-                const logout = () => { if (auth) auth.signOut().then(() => { user.value = null; alert("已退出，回到本地模式"); }); };
+                const logout = () => { if (auth) auth.signOut().then(() => { user.value = null; alert("Signed out, back to local mode"); }); };
 
                 const syncToCloud = async () => {
                     if (!user.value || !db) return;
@@ -429,6 +609,7 @@
                             boards: boards.value,
                             activeBoardId: activeBoardId.value,
                             backgroundImage: backgroundImage.value,
+                            themeColor: themeColor.value,
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
                         syncStatus.value = { show: true, state: 'saved' };
@@ -438,7 +619,7 @@
 
                 let saveTimeout;
                 const debouncedSave = () => {
-                    localStorage.setItem('myPapalyData_v19', JSON.stringify({ boards: boards.value, activeBoardId: activeBoardId.value, backgroundImage: backgroundImage.value }));
+                    localStorage.setItem('myPapalyData_v19', JSON.stringify({ boards: boards.value, activeBoardId: activeBoardId.value, backgroundImage: backgroundImage.value, themeColor: themeColor.value }));
                     if (user.value) { clearTimeout(saveTimeout); syncStatus.value = { show: true, state: 'saving' }; saveTimeout = setTimeout(syncToCloud, 2000); }
                 };
 
@@ -452,7 +633,7 @@
                                 const doc = await db.collection("users").doc(u.uid).get();
                                 if (doc.exists) {
                                     const d = doc.data();
-                                    boards.value = d.boards || []; activeBoardId.value = d.activeBoardId; backgroundImage.value = d.backgroundImage || backgroundImage.value;
+                                    boards.value = d.boards || []; activeBoardId.value = d.activeBoardId; backgroundImage.value = d.backgroundImage || backgroundImage.value; themeColor.value = d.themeColor || 'blue';
                                     debouncedSave(); setTimeout(initSortable, 100);
                                 } else { syncToCloud(); }
                             }
@@ -466,10 +647,10 @@
                     let saved = localStorage.getItem('myPapalyData_v19');
                     if (!saved) saved = localStorage.getItem('myPapalyData_v18');
                     if (!saved) saved = localStorage.getItem('myPapalyData_v16');
-                    if (saved) { try { const p = JSON.parse(saved); boards.value = p.boards || []; activeBoardId.value = p.activeBoardId; backgroundImage.value = p.backgroundImage || backgroundImage.value; } catch (e) { } }
+                    if (saved) { try { const p = JSON.parse(saved); boards.value = p.boards || []; activeBoardId.value = p.activeBoardId; backgroundImage.value = p.backgroundImage || backgroundImage.value; themeColor.value = p.themeColor || 'blue'; } catch (e) { } }
                     if (boards.value.length === 0) initDefaultData();
                 };
-                const initDefaultData = () => { const def = { id: Date.now(), title: '主页', icon: 'fas fa-rocket', columns: [{ id: 'c1', width: 280, categories: [{ id: 'cat1', title: '示例', bookmarks: [{ id: 'b1', title: 'Google', url: 'https://google.com', type: 'link', icon: 'https://www.google.com/s2/favicons?domain=google.com' }] }] }] }; boards.value = [def]; activeBoardId.value = def.id; };
+                const initDefaultData = () => { const def = { id: Date.now(), title: 'Home', icon: 'fas fa-bookmark', columns: [{ id: 'c1', width: 280, categories: [{ id: 'cat1', title: 'Example', bookmarks: [{ id: 'b1', title: 'Google', url: 'https://google.com', type: 'link', icon: 'https://www.google.com/s2/favicons?domain=google.com' }] }] }] }; boards.value = [def]; activeBoardId.value = def.id; };
 
                 // --- Import / Export (Added Back) ---
                 const distributeCategoriesToColumns = (categories, columnCount = 4) => {
@@ -498,7 +679,8 @@
                                     const a = node.querySelector('a'); const h3 = node.querySelector('h3'); const subDl = node.querySelector('dl');
                                     if (a) {
                                         const icon = a.getAttribute('data-icon') || `https://www.google.com/s2/favicons?domain=${new URL(a.href).origin}&sz=32`;
-                                        bms.push({ id: 'bm-' + Math.random(), title: a.textContent.trim(), url: a.href, type: 'link', icon });
+                                        const note = a.getAttribute('data-note') || '';
+                                        bms.push({ id: 'bm-' + Math.random(), title: a.textContent.trim(), url: a.href, type: 'link', icon, note });
                                     } else if (h3) {
                                         bms.push({ id: 'div-' + Math.random(), title: h3.textContent.trim(), type: 'divider' });
                                         if (subDl) bms.push(...parseBookmarks(subDl));
@@ -539,7 +721,7 @@
                     let html = `<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">\n<TITLE>Bookmarks</TITLE>\n<H1>Bookmarks</H1>\n<DL><p>\n`;
                     boards.value.forEach(board => {
                         html += `    <DT><H3>${board.title}</H3>\n    <DL><p>\n`;
-                        board.columns.forEach(col => { col.categories.forEach(cat => { html += `        <DT><H3>${cat.title}</H3>\n        <DL><p>\n`; cat.bookmarks.forEach(bm => { if (bm.type === 'link') { const iconAttr = bm.icon ? ` data-icon="${bm.icon}"` : ''; html += `            <DT><A HREF="${bm.url}"${iconAttr}>${bm.title}</A>\n`; } else if (bm.type === 'divider') html += `            <DT><H3>${bm.title}</H3><DL></DL>\n`; }); html += `        </DL><p>\n`; }); });
+                        board.columns.forEach(col => { col.categories.forEach(cat => { html += `        <DT><H3>${cat.title}</H3>\n        <DL><p>\n`; cat.bookmarks.forEach(bm => { if (bm.type === 'link') { const iconAttr = bm.icon ? ` data-icon="${bm.icon}"` : ''; const noteAttr = bm.note ? ` data-note="${bm.note.replace(/"/g, '&quot;')}"` : ''; html += `            <DT><A HREF="${bm.url}"${iconAttr}${noteAttr}>${bm.title}</A>\n`; } else if (bm.type === 'divider') html += `            <DT><H3>${bm.title}</H3><DL></DL>\n`; }); html += `        </DL><p>\n`; }); });
                         html += `    </DL><p>\n`;
                     });
                     html += `</DL>`;
@@ -548,9 +730,9 @@
 
                 // --- Standard Logic ---
                 const onCategoryDragStart = (colId, category, event) => { draggingCategoryInfo.value = { columnId: colId, category: category }; };
-                const onDragOverBoard = (boardId) => { if (draggingCategoryInfo.value && boardId !== activeBoardId.value) dragTargetBoardId.value = boardId; };
-                const onDragLeaveBoard = (boardId) => { if (dragTargetBoardId.value === boardId) dragTargetBoardId.value = null; };
-                const onDropToBoard = (targetBoardId) => {
+                const onDragOverCollection = (boardId) => { if (draggingCategoryInfo.value && boardId !== activeBoardId.value) dragTargetBoardId.value = boardId; };
+                const onDragLeaveCollection = (boardId) => { if (dragTargetBoardId.value === boardId) dragTargetBoardId.value = null; };
+                const onDropToCollection = (targetBoardId) => {
                     if (!draggingCategoryInfo.value || !targetBoardId || targetBoardId === activeBoardId.value) return;
                     const { columnId, category } = draggingCategoryInfo.value;
                     const currentBoard = boards.value.find(b => b.id === activeBoardId.value);
@@ -578,7 +760,7 @@
                     }
                     mergeTargetCatId.value = null; draggingCategoryInfo.value = null;
                 };
-                const moveCategoryToBoard = (currentColId, category, targetBoardId) => { if (confirm("移动到目标画板？")) { draggingCategoryInfo.value = { columnId: currentColId, category: category }; onDropToBoard(targetBoardId); } };
+                const moveCategoryToCollection = (currentColId, category, targetBoardId) => { if (confirm("Move to target collection?")) { draggingCategoryInfo.value = { columnId: currentColId, category: category }; onDropToCollection(targetBoardId); } };
 
                 const initSortable = () => {
                     nextTick(() => {
@@ -600,14 +782,14 @@
                 const deleteColumn = (id) => { if (confirm("删除此列？")) { activeBoard.value.columns = activeBoard.value.columns.filter(c => c.id !== id); saveData(); } };
                 const createCategory = (colId) => { const col = activeBoard.value.columns.find(c => c.id === colId); if (col) { col.categories.push({ id: 'cat-' + Date.now(), title: '新分类', bookmarks: [] }); saveData(); setTimeout(initSortable, 50); } };
                 const deleteCategory = (colId, catId) => { if (confirm("删除此卡片？")) { const col = activeBoard.value.columns.find(c => c.id === colId); col.categories = col.categories.filter(c => c.id !== catId); saveData(); } };
-                const addBookmark = (catId) => { modal.value = { show: true, categoryId: catId, data: { title: '', url: '', icon: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
+                const addBookmark = (catId) => { modal.value = { show: true, categoryId: catId, data: { title: '', url: '', icon: '', note: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
                 const addSubCategory = (catId) => { modal.value = { show: true, isDivider: true, categoryId: catId, data: { title: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
-                const editBookmark = (catId, bm) => { modal.value = { show: true, isEdit: true, isDivider: bm.type === 'divider', categoryId: catId, data: { ...bm, icon: bm.icon || '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
+                const editBookmark = (catId, bm) => { modal.value = { show: true, isEdit: true, isDivider: bm.type === 'divider', categoryId: catId, data: { ...bm, icon: bm.icon || '', note: bm.note || '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
                 const deleteBookmark = (catId, bmId) => { for (const col of activeBoard.value.columns) { const cat = col.categories.find(c => c.id === catId); if (cat) { cat.bookmarks = cat.bookmarks.filter(b => b.id !== bmId); break; } } saveData(); };
                 const handleEnterKey = () => { if (modal.value.isBoard || modal.value.isDivider || modal.value.data.title) saveModal(); };
                 const saveModal = () => {
                     const { categoryId, data, isEdit, isBoard, isDivider } = modal.value;
-                    if (isBoard) { if (!data.title.trim()) return; const newBoard = { id: Date.now(), title: data.title, icon: 'fas fa-layer-group', columns: [{ id: 'c1', width: 280, categories: [] }] }; boards.value.push(newBoard); activeBoardId.value = newBoard.id; saveData(); }
+                    if (isBoard) { if (!data.title.trim()) return; const newBoard = { id: Date.now(), title: data.title, icon: 'fas fa-bookmark', columns: [{ id: 'c1', width: 280, categories: [] }] }; boards.value.push(newBoard); activeBoardId.value = newBoard.id; saveData(); }
                     else {
                         let targetCat; for (const col of activeBoard.value.columns) { targetCat = col.categories.find(c => c.id === categoryId); if (targetCat) break; }
                         if (!targetCat) return;
@@ -615,7 +797,7 @@
                         if (!isDivider && !data.url.startsWith('http')) data.url = 'https://' + data.url;
                         if (!data.title && !isDivider) data.title = new URL(data.url).hostname.replace('www.', '');
                         if (isEdit) { const idx = targetCat.bookmarks.findIndex(b => b.id === data.id); if (idx !== -1) targetCat.bookmarks[idx] = { ...data }; }
-                        else { targetCat.bookmarks.push({ id: 'bm-' + Date.now(), title: data.title, url: isDivider ? undefined : data.url, type: isDivider ? 'divider' : 'link', icon: isDivider ? undefined : (data.icon || '') }); }
+                        else { targetCat.bookmarks.push({ id: 'bm-' + Date.now(), title: data.title, url: isDivider ? undefined : data.url, type: isDivider ? 'divider' : 'link', icon: isDivider ? undefined : (data.icon || ''), note: isDivider ? undefined : (data.note || '') }); }
                         saveData();
                     }
                     modal.value.show = false;
@@ -626,14 +808,14 @@
                 const handleImgError = (e) => e.target.src = "https://via.placeholder.com/32?text=•";
                 const openUrl = (url) => { if (url) window.open(url.startsWith('http') ? url : 'https://' + url, '_blank'); };
                 const setRandomBg = () => { backgroundImage.value = `https://source.unsplash.com/random/1920x1080?office,white&t=${Date.now()}`; saveData(); };
-                const resetData = () => { if (confirm("确定要清空所有数据并重置吗？")) { localStorage.removeItem('myPapalyData_v19'); location.reload(); } };
+                const resetData = () => { if (confirm("Are you sure you want to clear all data and reset?")) { localStorage.removeItem('myPapalyData_v19'); location.reload(); } };
 
                 return {
-                    boards, activeBoardId, activeBoard, backgroundImage, searchQuery, modal, showSettings, modalTitle: computed(() => { if (modal.value.isBoard) return '新建画板'; if (modal.value.isDivider) return '添加分割线'; return modal.value.isEdit ? '编辑' : '添加'; }),
+                    boards, activeBoardId, activeBoard, backgroundImage, searchQuery, modal, showSettings, modalTitle: computed(() => { if (modal.value.isBoard) return 'New Collection'; if (modal.value.isDivider) return 'Add Divider'; return modal.value.isEdit ? 'Edit' : 'Add'; }),
                     modalInput, user, syncStatus,
                     saveData, openCreateBoardModal, deleteBoard, createColumn, deleteColumn, createCategory, deleteCategory, addBookmark, addSubCategory, editBookmark, deleteBookmark, saveModal, handleEnterKey, getModalIcon, getFavicon, handleImgError, openUrl, setRandomBg, startResize, switchBoard, filterCategories, boardContainer: ref(null), resetData,
-                    onCategoryDragStart, onDragOverBoard, onDragLeaveBoard, onDropToBoard, dragTargetBoardId, onMergeDragOver, onMergeDragLeave, onMergeDrop, mergeTargetCatId,
-                    login, logout, exportHtml, importHtml, moveCategoryToBoard
+                    onCategoryDragStart, onDragOverCollection, onDragLeaveCollection, onDropToCollection, dragTargetBoardId, onMergeDragOver, onMergeDragLeave, onMergeDrop, mergeTargetCatId,
+                    login, logout, exportHtml, importHtml, moveCategoryToCollection, sidebarOpen, themeColor
                 };
             }
         }).mount('#app');
