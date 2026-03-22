@@ -194,8 +194,8 @@
                 :style="dragTargetBoardId === board.id ? 'background:rgba(79,142,247,.2)' : ''">
                 <i :class="board.icon || 'fas fa-bookmark'" style="font-size:11px;opacity:.7"></i>
                 {{ board.title }}
-                <span v-if="boards.length > 1" class="x-btn" @click.stop="deleteBoard(board.id)">
-                    <i class="fas fa-times"></i>
+                <span v-if="boards.length > 1" class="x-btn" @click.stop="openEditBoardModal(board.id)">
+                    <i class="fas fa-pen"></i>
                 </span>
             </div>
             <div class="nav-tab" style="opacity:.6" @click="openCreateBoardModal">
@@ -226,7 +226,9 @@
 
     <!-- ── Subbar ── -->
     <div v-if="activeBoard" class="subbar">
-        <input v-model="activeBoard.title" @change="saveData" placeholder="Collection name">
+        <span style="font-size:13px;font-weight:700;color:var(--text)">
+            <i :class="activeBoard.icon || 'fas fa-bookmark'" style="margin-right:6px;opacity:.6"></i>{{ activeBoard.title }}
+        </span>
         <div class="subbar-btns">
             <button class="subbar-btn" @click="createColumn"><i class="fas fa-columns"></i> Column</button>
             <button class="subbar-btn" @click="createCategory()"><i class="fas fa-list-alt"></i> Category</button>
@@ -443,6 +445,9 @@
                             {{ analyzingUrl ? 'Analyzing...' : 'Analyze' }}
                         </button>
                         <button class="btn btn-primary" @click="saveModal" :disabled="!modal.data.title || (!modal.isBoard && !modal.isDivider && !modal.data.url)">Save</button>
+                        <button v-if="modal.isBoard && modal.isEdit && boards.length > 1" class="btn" style="background:rgba(239,68,68,.12);color:#ef4444;margin-right:auto;order:-1" @click="deleteBoardFromModal">
+                            <i class="fas fa-trash-alt" style="margin-right:5px"></i>Delete
+                        </button>
                     </div>
                 </div>
             </div>
@@ -822,8 +827,10 @@
                 const startResize = (e, column) => { e.preventDefault(); resizing.value = { column, startX: e.pageX, startWidth: column.width || 280 }; document.body.style.cursor = 'col-resize'; };
                 const doResize = (e) => { if (!resizing.value) return; let newWidth = resizing.value.startWidth + (e.pageX - resizing.value.startX); if (newWidth < 180) newWidth = 180; if (newWidth > 600) newWidth = 600; resizing.value.column.width = newWidth; };
                 const stopResize = () => { if (resizing.value) { resizing.value = null; document.body.style.cursor = ''; saveData(); } };
-                const openCreateBoardModal = () => { modal.value = { show: true, isEdit: false, isBoard: true, data: { title: '' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
+                const openCreateBoardModal = () => { modal.value = { show: true, isEdit: false, isBoard: true, data: { title: '', icon: 'fas fa-bookmark' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
+                const openEditBoardModal = (id) => { const b = boards.value.find(b => b.id === id); if (!b) return; modal.value = { show: true, isEdit: true, isBoard: true, data: { id: b.id, title: b.title, icon: b.icon || 'fas fa-bookmark' } }; nextTick(() => modalInput.value && modalInput.value.focus()); };
                 const deleteBoard = (id) => { if (boards.value.length <= 1) { showToast("Cannot delete the last collection", "error"); return; }; showConfirm("Delete this collection?", () => { boards.value = boards.value.filter(b => b.id !== id); if (activeBoardId.value === id) activeBoardId.value = boards.value[0].id; saveData(); }, true); };
+                const deleteBoardFromModal = () => { const id = modal.value.data.id; modal.value.show = false; deleteBoard(id); };
                 const createColumn = () => { if (!activeBoard.value) return; activeBoard.value.columns.push({ id: 'col-' + Date.now(), width: 280, categories: [] }); saveData(); setTimeout(initSortable, 50); nextTick(() => { const el = document.getElementById('boardContainer'); if (el) el.scrollLeft = el.scrollWidth; }); };
                 const deleteColumn = (id) => { showConfirm("Delete this entire column?", () => { activeBoard.value.columns = activeBoard.value.columns.filter(c => c.id !== id); saveData(); }, true); };
                 const createCategory = (colId) => {
@@ -883,7 +890,7 @@
                 };
                 const saveModal = () => {
                     const { categoryId, subId, data, isEdit, isBoard, isDivider } = modal.value;
-                    if (isBoard) { if (!data.title.trim()) return; const newBoard = { id: Date.now(), title: data.title, icon: 'fas fa-bookmark', columns: [{ id: 'c1', width: 280, categories: [] }] }; boards.value.push(newBoard); activeBoardId.value = newBoard.id; saveData(); }
+                    if (isBoard) { if (!data.title.trim()) return; if (isEdit) { const b = boards.value.find(b => b.id === data.id); if (b) { b.title = data.title; b.icon = data.icon || 'fas fa-bookmark'; saveData(); } } else { const newBoard = { id: Date.now(), title: data.title, icon: data.icon || 'fas fa-bookmark', columns: [{ id: 'c1', width: 280, categories: [] }] }; boards.value.push(newBoard); activeBoardId.value = newBoard.id; saveData(); } }
                     else {
                         let targetCat; for (const col of activeBoard.value.columns) { targetCat = col.categories.find(c => c.id === categoryId); if (targetCat) break; }
                         if (!targetCat) return;
@@ -954,9 +961,9 @@
                 };
 
                 return {
-                    boards, activeBoardId, activeBoard, searchQuery, modal, showSettings, modalTitle: computed(() => { if (modal.value.isBoard) return 'New Collection'; if (modal.value.isDivider) return 'Add Divider'; return modal.value.isEdit ? 'Edit' : 'Add'; }),
+                    boards, activeBoardId, activeBoard, searchQuery, modal, showSettings, modalTitle: computed(() => { if (modal.value.isBoard) return modal.value.isEdit ? 'Edit Collection' : 'New Collection'; if (modal.value.isDivider) return 'Add Divider'; return modal.value.isEdit ? 'Edit' : 'Add'; }),
                     modalInput, user, syncStatus, isDark, toasts, showToast, confirmData, closeConfirm, executeConfirm, viewMode, searchOverlayOpen, flatSearchResults, highlightText,
-                    saveData, openCreateBoardModal, deleteBoard, createColumn, deleteColumn, createCategory, deleteCategory, addBookmark, addSubCategory, editSubcategory, deleteSubcategory, editBookmark, deleteBookmark, saveModal, handleEnterKey, getModalIcon, getFavicon, handleImgError, openUrl, startResize, switchBoard, filterCategories, boardContainer: ref(null), resetData,
+                    saveData, openCreateBoardModal, openEditBoardModal, deleteBoardFromModal, deleteBoard, createColumn, deleteColumn, createCategory, deleteCategory, addBookmark, addSubCategory, editSubcategory, deleteSubcategory, editBookmark, deleteBookmark, saveModal, handleEnterKey, getModalIcon, getFavicon, handleImgError, openUrl, startResize, switchBoard, filterCategories, boardContainer: ref(null), resetData,
                     onDragOverCollection, onDragLeaveCollection, onDropToCollection, dragTargetBoardId, onMergeDragOver, onMergeDragLeave, onMergeDrop, mergeTargetCatId,
                     login, logout, exportHtml, importHtml, moveCategoryToCollection, sidebarOpen, themeColor, analyzeUrl, analyzingUrl
                 };
