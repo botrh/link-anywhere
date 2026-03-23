@@ -38,6 +38,12 @@ function createSortable({ activeBoard, saveData, draggingCategoryInfo, mergeTarg
                         } catch (e) { draggingCategoryInfo.value = null; }
                     },
                     onEnd: (evt) => {
+                        // If draggingCategoryInfo is already null, it means onDropToCollection
+                        // or onMergeDrop already handled this drag — skip to avoid double-processing
+                        if (draggingCategoryInfo.value === null) {
+                            mergeTargetCatId.value = null;
+                            return;
+                        }
                         const fromCol = activeBoard.value.columns.find(c => c.id == evt.from.dataset.colId);
                         const toCol = activeBoard.value.columns.find(c => c.id == evt.to.dataset.colId);
                         if (fromCol && toCol) {
@@ -119,8 +125,6 @@ function createSortable({ activeBoard, saveData, draggingCategoryInfo, mergeTarg
         if (targetBoard.columns.length === 0) targetBoard.columns.push({ id: 'col-' + Date.now(), width: 280, categories: [] });
         const destCol = targetBoard.columns[0];
         destCol.categories.push(JSON.parse(JSON.stringify(category)));
-        // 更新 draggingCategoryInfo 指向目标 board 的列，以便后续拖回时能正确找到
-        draggingCategoryInfo.value = { columnId: destCol.id, category: destCol.categories[destCol.categories.length - 1] };
         saveData(); dragTargetBoardId.value = null; draggingCategoryInfo.value = null;
     };
 
