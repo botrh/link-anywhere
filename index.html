@@ -24,9 +24,9 @@
         <div class="nav-logo">
             <img src="image/icon.jpeg" class="w-7 h-7 rounded-md" alt="icon">
         </div>
-        <div class="nav-tabs no-scroll">
+        <div class="nav-tabs no-scroll" id="nav-tabs">
             <div v-for="board in boards" :key="board.id"
-                class="nav-tab" :class="{ active: activeBoardId === board.id }"
+                class="nav-tab nav-tab-draggable" :class="{ active: activeBoardId === board.id }"
                 @click="switchBoard(board.id)"
                 @dragover.prevent="onDragOverCollection(board.id)"
                 @dragleave="onDragLeaveCollection(board.id)"

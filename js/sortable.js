@@ -1,10 +1,26 @@
 // Drag & drop logic using SortableJS
 // Depends on: Sortable (global), Vue nextTick, activeBoard ref, saveData fn
 
-function createSortable({ activeBoard, saveData, draggingCategoryInfo, mergeTargetCatId, nextTick }) {
+function createSortable({ activeBoard, boards, saveData, draggingCategoryInfo, mergeTargetCatId, nextTick }) {
 
     const initSortable = () => {
         nextTick(() => {
+            // Board (collection) tab reorder
+            const navTabs = document.getElementById('nav-tabs');
+            if (navTabs) {
+                new Sortable(navTabs, {
+                    animation: 150,
+                    draggable: '.nav-tab-draggable',
+                    ghostClass: 'sortable-ghost',
+                    onEnd: (evt) => {
+                        if (evt.oldIndex === evt.newIndex) return;
+                        const item = boards.value.splice(evt.oldIndex, 1)[0];
+                        boards.value.splice(evt.newIndex, 0, item);
+                        saveData();
+                    }
+                });
+            }
+
             // Column reorder
             const colContainer = document.getElementById('columns-container');
             if (colContainer) {

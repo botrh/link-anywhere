@@ -90,7 +90,7 @@ createApp({
         };
 
         // ── Sortable ──
-        const { initSortable, onDragOverCollection: _onDragOver, onDragLeaveCollection: _onDragLeave, onDropToCollection: _onDrop, onMergeDragOver, onMergeDragLeave, onMergeDrop: _onMergeDrop } = createSortable({ activeBoard, saveData: () => debouncedSave(), draggingCategoryInfo, mergeTargetCatId, nextTick });
+        const { initSortable, onDragOverCollection: _onDragOver, onDragLeaveCollection: _onDragLeave, onDropToCollection: _onDrop, onMergeDragOver, onMergeDragLeave, onMergeDrop: _onMergeDrop } = createSortable({ activeBoard, boards, saveData: () => debouncedSave(), draggingCategoryInfo, mergeTargetCatId, nextTick });
 
         const onDragOverCollection = (boardId) => _onDragOver(boardId, activeBoardId, dragTargetBoardId);
         const onDragLeaveCollection = (boardId) => _onDragLeave(boardId, dragTargetBoardId);
