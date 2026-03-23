@@ -123,7 +123,7 @@ createApp({
         };
 
         // ── Column / Category / Bookmark CRUD ──
-        const switchBoard = (id) => { activeBoardId.value = id; saveData(); setTimeout(initSortable, 100); };
+        const switchBoard = (id) => { activeBoardId.value = id; localStorage.setItem('myPapalyData_v19', JSON.stringify({ boards: boards.value, activeBoardId: activeBoardId.value, themeColor: themeColor.value })); setTimeout(initSortable, 100); };
         watch(activeBoardId, () => setTimeout(initSortable, 100));
 
         const startResize = (e, column) => { e.preventDefault(); resizing.value = { column, startX: e.pageX, startWidth: column.width || 280 }; document.body.style.cursor = 'col-resize'; };
