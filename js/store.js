@@ -93,8 +93,11 @@ function createStore({ boards, activeBoardId, themeColor, syncStatus, user, show
     const saveData = () => debouncedSave();
 
     const resetData = (showConfirm) => {
-        showConfirm("Are you sure you want to clear all data and reset? This cannot be undone.", () => {
+        showConfirm("Are you sure you want to clear all data and reset? This cannot be undone.", async () => {
             localStorage.removeItem('myPapalyData_v19');
+            if (user.value && db) {
+                try { await db.collection("users").doc(user.value.uid).delete(); } catch (e) {}
+            }
             location.reload();
         }, true);
     };
