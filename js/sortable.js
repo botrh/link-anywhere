@@ -110,11 +110,17 @@ function createSortable({ activeBoard, saveData, draggingCategoryInfo, mergeTarg
         if (!draggingCategoryInfo.value || !targetBoardId || targetBoardId === activeBoardId.value) return;
         const { columnId, category } = draggingCategoryInfo.value;
         const currentBoard = boards.value.find(b => b.id === activeBoardId.value);
+        if (!currentBoard) { draggingCategoryInfo.value = null; dragTargetBoardId.value = null; return; }
         const sourceCol = currentBoard.columns.find(c => c.id === columnId);
+        if (!sourceCol) { draggingCategoryInfo.value = null; dragTargetBoardId.value = null; return; }
         sourceCol.categories = sourceCol.categories.filter(c => c.id !== category.id);
         const targetBoard = boards.value.find(b => b.id === targetBoardId);
+        if (!targetBoard) { draggingCategoryInfo.value = null; dragTargetBoardId.value = null; return; }
         if (targetBoard.columns.length === 0) targetBoard.columns.push({ id: 'col-' + Date.now(), width: 280, categories: [] });
-        targetBoard.columns[0].categories.push(JSON.parse(JSON.stringify(category)));
+        const destCol = targetBoard.columns[0];
+        destCol.categories.push(JSON.parse(JSON.stringify(category)));
+        // 更新 draggingCategoryInfo 指向目标 board 的列，以便后续拖回时能正确找到
+        draggingCategoryInfo.value = { columnId: destCol.id, category: destCol.categories[destCol.categories.length - 1] };
         saveData(); dragTargetBoardId.value = null; draggingCategoryInfo.value = null;
     };
 
